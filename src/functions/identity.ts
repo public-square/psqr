@@ -1,3 +1,4 @@
+// @ts-ignore: rmSync is available despite warnings
 import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync } from 'fs';
 
 import { createHash } from 'crypto';
@@ -350,7 +351,7 @@ async function getIdentity(kid = ''): Promise<IdentityResponse> {
             if (kresp.success === false) return kresp;
             keyPairs.push(kresp.keyPairs[0]);
         }
-    
+
         // get all components of identity being used and assemble Identity obj
         const identity = Identity.check({
             did: bdid,
@@ -865,7 +866,7 @@ async function retrieveKeys(keyFiles: KeyFile[]): Promise<Static<typeof KeyPair>
         let privateFile: FileConfig | boolean = false;
         for (let j = 0; j < resp.files.length; j++) {
             const f = resp.files[j];
-            
+
             // validate file object and add if it is the private key
             if (typeof f === 'object' && f.path.includes(key.privateFile)) {
                 privateFile = f;
@@ -885,10 +886,10 @@ async function retrieveKeys(keyFiles: KeyFile[]): Promise<Static<typeof KeyPair>
             if (typeof key.publicFile !== 'undefined') {
                 for (let k = 0; k < resp.files.length; k++) {
                     const f = resp.files[k];
-            
+
                     // validate file object and add if it is the public key
                     if (
-                        typeof f === 'object' && 
+                        typeof f === 'object' &&
                         typeof f.data === 'string' &&
                         f.path.includes(key.publicFile)
                     ) {
@@ -1225,7 +1226,7 @@ function parseDidUrl(did: string): Static<typeof Url> | false {
 
 /**
  * Determines what kind of DID a DID string refers to.
- * 
+ *
  * @param did string identifying a DID
  * @returns identified type as string
  */

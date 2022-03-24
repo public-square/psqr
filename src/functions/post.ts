@@ -417,6 +417,7 @@ async function putPost(jwsPost: Static<typeof JwsPost>, config: PutConfig, lgr: 
                 }
             }
 
+            // @ts-ignore: response contains id
             const resp: PublishResponse = v.value;
             return {
                 success: true,
@@ -465,12 +466,14 @@ function filterPostValues(skeleton: Static<typeof PostSkeleton>, filters: Static
 
             for (let i = 0; i < list.length; i++) {
                 const filterValue = list[i];
-                
+
                 const skel = skeleton[key];
                 if (skel === filterValue) {
                     if (typeof skel === 'string') {
+                        // @ts-ignore: we just verified this is a string
                         skeleton[key] = '';
                     } else if (typeof skel === 'number') {
+                        // @ts-ignore: we just verified this is a number
                         skeleton[key] = 0;
                     }
                 }

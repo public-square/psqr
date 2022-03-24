@@ -27,7 +27,7 @@ const defaultTwitterToken = 'AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8x
 
 /**
  * Prompt the user for info on how they want to setup their Identity
- * 
+ *
  * @returns idSetup reponse object with combined responses
  */
 async function promptIdentitySetup(): Promise<any> {
@@ -62,7 +62,7 @@ async function promptIdentitySetup(): Promise<any> {
                 ...idSetup,
                 ...didPrompt
             };
-            
+
             // If creating new keys prompt the user
             const keyQuery = [];
             if (didPrompt.keyImport === keyImportChoices[0]) {
@@ -117,7 +117,7 @@ async function promptIdentitySetup(): Promise<any> {
 /**
  * Take identity setup and create or import the identity as specified,
  * then save that identity as the default
- * 
+ *
  * @param idSetup inquirer response object containing responses from promptIdentitySetup
  * @param oraOutput ora variable to update with appropriate status message
  * @returns identity response with full identity if successful
@@ -218,7 +218,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
                 let privKey, pubKey;
                 for (let i = 0; i < kfResp.files.length; i++) {
                     const f = kfResp.files[i];
-                    
+
                     if (typeof f === 'string' || typeof f.data !== 'string') continue;
                     if (f.path.includes(privPath)) {
                         privKey = f.data;
@@ -319,7 +319,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
 
 /**
  * Prompt the user for info on the network they want to add
- * 
+ *
  * @returns netSetup response object with combined responses
  */
 async function promptNetworkSetup(): Promise<any> {
@@ -356,7 +356,7 @@ async function promptNetworkSetup(): Promise<any> {
 /**
  * Take the network setup and add it to psqr,
  * then save it as the default
- * 
+ *
  * @param netSetup inquirer response object containing responses from promptNetworkSetup
  * @param oraOutput ora variable to update with appropriate status message
  * @param force skip any confirmation and ora output and just persist
@@ -446,7 +446,7 @@ async function persistNetworkSetup(netSetup: any, oraOutput: any, force = false)
 
 /**
  * Prompt the user for account values for the proxy they want to use
- * 
+ *
  * @returns proxySetup response object with combined responses
  */
 async function promptProxySetup(): Promise<any> {
@@ -479,7 +479,7 @@ async function promptProxySetup(): Promise<any> {
 
 /**
  * Take the proxy setup and save those values as env vars
- * 
+ *
  * @param proxySetup inquirer response object containing responses from promptProxySetup
  * @returns data response describing success
  */
@@ -535,7 +535,7 @@ async function persistProxySetup(proxySetup: any): Promise<DataResponse> {
 /**
  * Prompt the user for info on what crawls they want to add.
  * This will go through one and then ask the user if they want to add another until they say no.
- * 
+ *
  * @param identity identity object that was generated earlier by the user
  * @returns crawlSetup response array with info for all requested crawls
  */
@@ -660,7 +660,7 @@ async function promptCrawlSetup(identity: Static<typeof Identity>): Promise<any[
                 };
                 break;
             default:
-                return;
+                return [];
         }
 
         results.push(result);
@@ -682,7 +682,7 @@ async function promptCrawlSetup(identity: Static<typeof Identity>): Promise<any[
 /**
  * Loop throught the provided crawl setups and create the appropriate crawl configs,
  * then save them as the defaults.
- * 
+ *
  * @param crawlSetup array of inquirer response objects containing responses from promptCrawlSetup
  * @param oraOutput ora variable to update with appropriate status message
  * @returns data response describing success
@@ -756,7 +756,7 @@ async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<Dat
                 break;
             case 'twitter':
                 // if token is included, save it as an env var
-                if (typeof configParams.token === 'string') {  
+                if (typeof configParams.token === 'string') {
                     setVars(`TWITTER_TOKEN=${configParams.token}`, false);
                 }
 
@@ -777,7 +777,7 @@ async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<Dat
                 break;
             case 'webhose':
                 // if token is included, save it as an env var
-                if (typeof configParams.token === 'string') {  
+                if (typeof configParams.token === 'string') {
                     setVars(`WEBHOSE_TOKEN=${configParams.token}`, false);
                 }
 

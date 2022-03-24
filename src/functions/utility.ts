@@ -1,3 +1,4 @@
+// @ts-ignore: rmSync is available despite warnings
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, appendFileSync, rmSync } from 'fs';
 
 import { DataResponse, ProxyConfig } from '../types/interfaces'

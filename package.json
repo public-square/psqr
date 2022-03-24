@@ -1,7 +1,7 @@
 {
   "name": "psqr",
   "description": "NodeJS CLI client for Virtual Public Squares.",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "Virtual Public Square (protocol@vpsqr.com)",
   "bin": {
     "psqr": "./bin/run"
@@ -15,7 +15,7 @@
     "eslint-config-oclif-typescript": "^0.1.0",
     "globby": "^10.0.2",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.9"
+    "typescript": "4.3.2"
   },
   "engines": {
     "node": ">=12.0.0"
@@ -48,7 +48,7 @@
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc.json -f table",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "prepack": "rm -rf lib && tsc -b && npx @oclif/dev-cli manifest",
     "test": "echo NO TESTS",
     "version": "npx @oclif/dev-cli readme && node ./generate-doc-html.js && git add README.md README.html",
     "generateDocs": "npx @oclif/dev-cli readme && node ./generate-doc-html.js"
