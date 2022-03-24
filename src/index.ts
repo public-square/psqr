@@ -1,1 +1,1 @@
-export const add = (a: number, b: number) => a + b
+export {run} from '@oclif/command'

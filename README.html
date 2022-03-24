@@ -1,21 +1,35 @@
-psqr
-====
 
-CLI client for the Public Square project
+<html lang="en">
 
-[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/psqr.svg)](https://npmjs.org/package/psqr)
-[![Downloads/week](https://img.shields.io/npm/dw/psqr.svg)](https://npmjs.org/package/psqr)
-[![License](https://img.shields.io/npm/l/psqr.svg)](https://github.com/newpress/public-square-client-cli/blob/master/package.json)
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://vpsqr.com/assets/icons/favicon.ico">
+    <title>PSQR CLI</title>
 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.css" rel="stylesheet"/>
+  </head>
+
+  <body>
+    <section class="container">
+        <h1 id="psqr">psqr</h1>
+<p>CLI client for the Public Square project</p>
+<p><a href="https://oclif.io"><img src="https://img.shields.io/badge/cli-oclif-brightgreen.svg" alt="oclif" /></a>
+<a href="https://npmjs.org/package/psqr"><img src="https://img.shields.io/npm/v/psqr.svg" alt="Version" /></a>
+<a href="https://npmjs.org/package/psqr"><img src="https://img.shields.io/npm/dw/psqr.svg" alt="Downloads/week" /></a>
+<a href="https://github.com/newpress/public-square-client-cli/blob/master/package.json"><img src="https://img.shields.io/npm/l/psqr.svg" alt="License" /></a></p>
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
+<ul>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#commands">Commands</a></li>
+</ul>
 <!-- tocstop -->
-# Usage
+<h1 id="usage">Usage</h1>
 <!-- usage -->
-```sh-session
-$ npm install -g psqr
+<pre><code class="sh-session language-sh-session">$ npm install -g psqr
 $ psqr COMMAND
 running command...
 $ psqr (-v|--version|version)
@@ -24,53 +38,51 @@ $ psqr --help [COMMAND]
 USAGE
   $ psqr COMMAND
 ...
-```
+</code></pre>
 <!-- usagestop -->
-# Commands
+<h1 id="commands">Commands</h1>
 <!-- commands -->
-* [`psqr config:export [DID]`](#psqr-configexport-did)
-* [`psqr config:import [PATH]`](#psqr-configimport-path)
-* [`psqr crawl [TYPE] [DID]`](#psqr-crawl-type-did)
-* [`psqr crawl:add:rss [KID] [URL]`](#psqr-crawladdrss-kid-url)
-* [`psqr crawl:add:sitemap [KID] [URL]`](#psqr-crawladdsitemap-kid-url)
-* [`psqr crawl:add:twitter [KID] [USERNAME]`](#psqr-crawladdtwitter-kid-username)
-* [`psqr crawl:add:webhose [KID] [USERNAME]`](#psqr-crawladdwebhose-kid-username)
-* [`psqr crawl:default [TYPE] [DID]`](#psqr-crawldefault-type-did)
-* [`psqr crawl:publish [TYPE] [DID]`](#psqr-crawlpublish-type-did)
-* [`psqr crawl:pull [TYPE] [DID]`](#psqr-crawlpull-type-did)
-* [`psqr crawl:remove [TYPE] [DID]`](#psqr-crawlremove-type-did)
-* [`psqr crawl:test [TYPE] [DID]`](#psqr-crawltest-type-did)
-* [`psqr env [FILE]`](#psqr-env-file)
-* [`psqr help [COMMAND]`](#psqr-help-command)
-* [`psqr identity [KID]`](#psqr-identity-kid)
-* [`psqr identity:add [KID]`](#psqr-identityadd-kid)
-* [`psqr identity:create [KID]`](#psqr-identitycreate-kid)
-* [`psqr identity:default [KID]`](#psqr-identitydefault-kid)
-* [`psqr identity:delete [DID]`](#psqr-identitydelete-did)
-* [`psqr identity:export [DID]`](#psqr-identityexport-did)
-* [`psqr identity:new [KID]`](#psqr-identitynew-kid)
-* [`psqr identity:propagate [DID]`](#psqr-identitypropagate-did)
-* [`psqr identity:resolve [DID]`](#psqr-identityresolve-did)
-* [`psqr identity:validate [KID] [PATH]`](#psqr-identityvalidate-kid-path)
-* [`psqr key:add [KID]`](#psqr-keyadd-kid)
-* [`psqr key:new [DID] [NAMES]`](#psqr-keynew-did-names)
-* [`psqr network`](#psqr-network)
-* [`psqr network:create [DOMAIN] [NAME]`](#psqr-networkcreate-domain-name)
-* [`psqr network:default [DOMAINS]`](#psqr-networkdefault-domains)
-* [`psqr network:remove [DOMAINS]`](#psqr-networkremove-domains)
-* [`psqr post [BODY]`](#psqr-post-body)
-* [`psqr post:create [BODY]`](#psqr-postcreate-body)
-* [`psqr post:put [HASH] [DATA]`](#psqr-postput-hash-data)
-* [`psqr post:sign [DATA]`](#psqr-postsign-data)
-* [`psqr search [QUERY]`](#psqr-search-query)
-* [`psqr setup`](#psqr-setup)
-
-## `psqr config:export [DID]`
-
-Export the full configuration for a specified DID
-
-```
-USAGE
+<ul>
+<li><a href="#psqr-configexport-did"><code>psqr config:export [DID]</code></a></li>
+<li><a href="#psqr-configimport-path"><code>psqr config:import [PATH]</code></a></li>
+<li><a href="#psqr-crawl-type-did"><code>psqr crawl [TYPE] [DID]</code></a></li>
+<li><a href="#psqr-crawladdrss-kid-url"><code>psqr crawl:add:rss [KID] [URL]</code></a></li>
+<li><a href="#psqr-crawladdsitemap-kid-url"><code>psqr crawl:add:sitemap [KID] [URL]</code></a></li>
+<li><a href="#psqr-crawladdtwitter-kid-username"><code>psqr crawl:add:twitter [KID] [USERNAME]</code></a></li>
+<li><a href="#psqr-crawladdwebhose-kid-username"><code>psqr crawl:add:webhose [KID] [USERNAME]</code></a></li>
+<li><a href="#psqr-crawldefault-type-did"><code>psqr crawl:default [TYPE] [DID]</code></a></li>
+<li><a href="#psqr-crawlpublish-type-did"><code>psqr crawl:publish [TYPE] [DID]</code></a></li>
+<li><a href="#psqr-crawlpull-type-did"><code>psqr crawl:pull [TYPE] [DID]</code></a></li>
+<li><a href="#psqr-crawlremove-type-did"><code>psqr crawl:remove [TYPE] [DID]</code></a></li>
+<li><a href="#psqr-crawltest-type-did"><code>psqr crawl:test [TYPE] [DID]</code></a></li>
+<li><a href="#psqr-env-file"><code>psqr env [FILE]</code></a></li>
+<li><a href="#psqr-help-command"><code>psqr help [COMMAND]</code></a></li>
+<li><a href="#psqr-identity-kid"><code>psqr identity [KID]</code></a></li>
+<li><a href="#psqr-identityadd-kid"><code>psqr identity:add [KID]</code></a></li>
+<li><a href="#psqr-identitycreate-kid"><code>psqr identity:create [KID]</code></a></li>
+<li><a href="#psqr-identitydefault-kid"><code>psqr identity:default [KID]</code></a></li>
+<li><a href="#psqr-identitydelete-did"><code>psqr identity:delete [DID]</code></a></li>
+<li><a href="#psqr-identityexport-did"><code>psqr identity:export [DID]</code></a></li>
+<li><a href="#psqr-identitynew-kid"><code>psqr identity:new [KID]</code></a></li>
+<li><a href="#psqr-identitypropagate-did"><code>psqr identity:propagate [DID]</code></a></li>
+<li><a href="#psqr-identityresolve-did"><code>psqr identity:resolve [DID]</code></a></li>
+<li><a href="#psqr-identityvalidate-kid-path"><code>psqr identity:validate [KID] [PATH]</code></a></li>
+<li><a href="#psqr-keyadd-kid"><code>psqr key:add [KID]</code></a></li>
+<li><a href="#psqr-keynew-did-names"><code>psqr key:new [DID] [NAMES]</code></a></li>
+<li><a href="#psqr-network"><code>psqr network</code></a></li>
+<li><a href="#psqr-networkcreate-domain-name"><code>psqr network:create [DOMAIN] [NAME]</code></a></li>
+<li><a href="#psqr-networkdefault-domains"><code>psqr network:default [DOMAINS]</code></a></li>
+<li><a href="#psqr-networkremove-domains"><code>psqr network:remove [DOMAINS]</code></a></li>
+<li><a href="#psqr-post-body"><code>psqr post [BODY]</code></a></li>
+<li><a href="#psqr-postcreate-body"><code>psqr post:create [BODY]</code></a></li>
+<li><a href="#psqr-postput-hash-data"><code>psqr post:put [HASH] [DATA]</code></a></li>
+<li><a href="#psqr-postsign-data"><code>psqr post:sign [DATA]</code></a></li>
+<li><a href="#psqr-search-query"><code>psqr search [QUERY]</code></a></li>
+<li><a href="#psqr-setup"><code>psqr setup</code></a></li>
+</ul>
+<h2 id="psqrconfigexportdid"><code>psqr config:export [DID]</code></h2>
+<p>Export the full configuration for a specified DID</p>
+<pre><code>USAGE
   $ psqr config:export [DID]
 
 ARGUMENTS
@@ -79,16 +91,11 @@ ARGUMENTS
 OPTIONS
   -h, --help             show CLI help
   -n, --network=network  domain of network to export instead of using default
-```
-
-_See code: [src/commands/config/export.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/config/export.ts)_
-
-## `psqr config:import [PATH]`
-
-Import a config and set as default if specified
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/config/export.ts">src/commands/config/export.ts</a></em></p>
+<h2 id="psqrconfigimportpath"><code>psqr config:import [PATH]</code></h2>
+<p>Import a config and set as default if specified</p>
+<pre><code>USAGE
   $ psqr config:import [PATH]
 
 ARGUMENTS
@@ -98,16 +105,11 @@ OPTIONS
   -d, --default  Set config values as the default in all cases
   -d, --key=key  Key name to use as default, if not specified the first available key will be used
   -h, --help     show CLI help
-```
-
-_See code: [src/commands/config/import.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/config/import.ts)_
-
-## `psqr crawl [TYPE] [DID]`
-
-Crawl new Posts from feeds and publish them.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/config/import.ts">src/commands/config/import.ts</a></em></p>
+<h2 id="psqrcrawltypedid"><code>psqr crawl [TYPE] [DID]</code></h2>
+<p>Crawl new Posts from feeds and publish them.</p>
+<pre><code>USAGE
   $ psqr crawl [TYPE] [DID]
 
 ARGUMENTS
@@ -128,16 +130,11 @@ OPTIONS
 DESCRIPTION
   Don't specify any arguments in order to use the defaults.
   If you want to crawl multiple configs use stdin or set them as the defaults.
-```
-
-_See code: [src/commands/crawl.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl.ts)_
-
-## `psqr crawl:add:rss [KID] [URL]`
-
-Create a new RSS Crawl config
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl.ts">src/commands/crawl.ts</a></em></p>
+<h2 id="psqrcrawladdrsskidurl"><code>psqr crawl:add:rss [KID] [URL]</code></h2>
+<p>Create a new RSS Crawl config</p>
+<pre><code>USAGE
   $ psqr crawl:add:rss [KID] [URL]
 
 ARGUMENTS
@@ -150,16 +147,11 @@ OPTIONS
   -i, --image=image                                Specify the default image value
   -l, --lang=lang                                  Specify the default lang value
   -p, --politicalSubdivision=politicalSubdivision  Specify the default politicalSubdivision value
-```
-
-_See code: [src/commands/crawl/add/rss.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/rss.ts)_
-
-## `psqr crawl:add:sitemap [KID] [URL]`
-
-Create or update a Sitemap crawl config
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/rss.ts">src/commands/crawl/add/rss.ts</a></em></p>
+<h2 id="psqrcrawladdsitemapkidurl"><code>psqr crawl:add:sitemap [KID] [URL]</code></h2>
+<p>Create or update a Sitemap crawl config</p>
+<pre><code>USAGE
   $ psqr crawl:add:sitemap [KID] [URL]
 
 ARGUMENTS
@@ -193,16 +185,11 @@ OPTIONS
                                                    to skip.
 
   -t, --filterTitle=filterTitle                    List of titles to never use divided by the pipe symbol (|).
-```
-
-_See code: [src/commands/crawl/add/sitemap.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/sitemap.ts)_
-
-## `psqr crawl:add:twitter [KID] [USERNAME]`
-
-Create a new Twitter Crawl config
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/sitemap.ts">src/commands/crawl/add/sitemap.ts</a></em></p>
+<h2 id="psqrcrawladdtwitterkidusername"><code>psqr crawl:add:twitter [KID] [USERNAME]</code></h2>
+<p>Create a new Twitter Crawl config</p>
+<pre><code>USAGE
   $ psqr crawl:add:twitter [KID] [USERNAME]
 
 ARGUMENTS
@@ -215,16 +202,11 @@ OPTIONS
   -i, --image=image                                Specify the default image value
   -l, --lang=lang                                  Specify the default lang value
   -p, --politicalSubdivision=politicalSubdivision  Specify the default politicalSubdivision value
-```
-
-_See code: [src/commands/crawl/add/twitter.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/twitter.ts)_
-
-## `psqr crawl:add:webhose [KID] [USERNAME]`
-
-Create a new Webhose Crawl config
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/twitter.ts">src/commands/crawl/add/twitter.ts</a></em></p>
+<h2 id="psqrcrawladdwebhosekidusername"><code>psqr crawl:add:webhose [KID] [USERNAME]</code></h2>
+<p>Create a new Webhose Crawl config</p>
+<pre><code>USAGE
   $ psqr crawl:add:webhose [KID] [USERNAME]
 
 ARGUMENTS
@@ -238,16 +220,11 @@ OPTIONS
   -i, --image=image                                Specify the default image value
   -l, --lang=lang                                  Specify the default lang value
   -p, --politicalSubdivision=politicalSubdivision  Specify the default politicalSubdivision value
-```
-
-_See code: [src/commands/crawl/add/webhose.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/webhose.ts)_
-
-## `psqr crawl:default [TYPE] [DID]`
-
-Set the default Crawl(s)
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/webhose.ts">src/commands/crawl/add/webhose.ts</a></em></p>
+<h2 id="psqrcrawldefaulttypedid"><code>psqr crawl:default [TYPE] [DID]</code></h2>
+<p>Set the default Crawl(s)</p>
+<pre><code>USAGE
   $ psqr crawl:default [TYPE] [DID]
 
 ARGUMENTS
@@ -261,16 +238,11 @@ OPTIONS
 
 DESCRIPTION
   Default behavior is to add specified Crawl(s) to defaults.
-```
-
-_See code: [src/commands/crawl/default.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/default.ts)_
-
-## `psqr crawl:publish [TYPE] [DID]`
-
-Publish posts stored with and Crawler.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/default.ts">src/commands/crawl/default.ts</a></em></p>
+<h2 id="psqrcrawlpublishtypedid"><code>psqr crawl:publish [TYPE] [DID]</code></h2>
+<p>Publish posts stored with and Crawler.</p>
+<pre><code>USAGE
   $ psqr crawl:publish [TYPE] [DID]
 
 ARGUMENTS
@@ -290,16 +262,11 @@ OPTIONS
 DESCRIPTION
   All posts that are in the posts dir of the Crawler will be signed,
   published to the broadcasters, and then deleted unless otherwise specified.
-```
-
-_See code: [src/commands/crawl/publish.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/publish.ts)_
-
-## `psqr crawl:pull [TYPE] [DID]`
-
-Crawl new Posts from feeds.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/publish.ts">src/commands/crawl/publish.ts</a></em></p>
+<h2 id="psqrcrawlpulltypedid"><code>psqr crawl:pull [TYPE] [DID]</code></h2>
+<p>Crawl new Posts from feeds.</p>
+<pre><code>USAGE
   $ psqr crawl:pull [TYPE] [DID]
 
 ARGUMENTS
@@ -317,16 +284,11 @@ DESCRIPTION
   If you want to crawl multiple configs use stdin or set them as the defaults.
   New posts from all feeds are retrieved and stored in their feed directories
   or locally if specified.
-```
-
-_See code: [src/commands/crawl/pull.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/pull.ts)_
-
-## `psqr crawl:remove [TYPE] [DID]`
-
-Remove Crawl configs.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/pull.ts">src/commands/crawl/pull.ts</a></em></p>
+<h2 id="psqrcrawlremovetypedid"><code>psqr crawl:remove [TYPE] [DID]</code></h2>
+<p>Remove Crawl configs.</p>
+<pre><code>USAGE
   $ psqr crawl:remove [TYPE] [DID]
 
 ARGUMENTS
@@ -336,16 +298,11 @@ ARGUMENTS
 OPTIONS
   -h, --help   show CLI help
   -s, --stdin  Use STDIN input as a list of newline separated DIDs.
-```
-
-_See code: [src/commands/crawl/remove.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/remove.ts)_
-
-## `psqr crawl:test [TYPE] [DID]`
-
-Run a test Crawl to verify the information gathered is accurate.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/remove.ts">src/commands/crawl/remove.ts</a></em></p>
+<h2 id="psqrcrawltesttypedid"><code>psqr crawl:test [TYPE] [DID]</code></h2>
+<p>Run a test Crawl to verify the information gathered is accurate.</p>
+<pre><code>USAGE
   $ psqr crawl:test [TYPE] [DID]
 
 ARGUMENTS
@@ -365,16 +322,11 @@ DESCRIPTION
   Output normally includes post.info.publicSquare.package only as json array.
   Output is saved as a local file(s) with the name crawl-test-{ level }-{ path valid did}-{ timestamp }.json(l) 
   depending on options selected.
-```
-
-_See code: [src/commands/crawl/test.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/test.ts)_
-
-## `psqr env [FILE]`
-
-View or set psqr environment vars. If a valid env [FILE] is specified it will replace the current env and be saved.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/test.ts">src/commands/crawl/test.ts</a></em></p>
+<h2 id="psqrenvfile"><code>psqr env [FILE]</code></h2>
+<p>View or set psqr environment vars. If a valid env [FILE] is specified it will replace the current env and be saved.</p>
+<pre><code>USAGE
   $ psqr env [FILE]
 
 ARGUMENTS
@@ -386,16 +338,11 @@ OPTIONS
   -l, --list      List current env vars and their values
   -p, --possible  List all possible env vars
   -s, --set=set   Set and save specific env vars. Format is comma separated key=value
-```
-
-_See code: [src/commands/env.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/env.ts)_
-
-## `psqr help [COMMAND]`
-
-display help for psqr
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/env.ts">src/commands/env.ts</a></em></p>
+<h2 id="psqrhelpcommand"><code>psqr help [COMMAND]</code></h2>
+<p>display help for psqr</p>
+<pre><code>USAGE
   $ psqr help [COMMAND]
 
 ARGUMENTS
@@ -403,16 +350,11 @@ ARGUMENTS
 
 OPTIONS
   --all  see all commands in CLI
-```
-
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.3.1/src/commands/help.ts)_
-
-## `psqr identity [KID]`
-
-List saved identities. 
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/oclif/plugin-help/blob/v3.3.1/src/commands/help.ts">@oclif/plugin-help</a></em></p>
+<h2 id="psqridentitykid"><code>psqr identity [KID]</code></h2>
+<p>List saved identities. </p>
+<pre><code>USAGE
   $ psqr identity [KID]
 
 ARGUMENTS
@@ -426,16 +368,11 @@ OPTIONS
 
 DESCRIPTION
   This command lists the identities that are currently saved and available.
-```
-
-_See code: [src/commands/identity.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity.ts)_
-
-## `psqr identity:add [KID]`
-
-Add a pre-existing identity to the cli config and create a new key.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity.ts">src/commands/identity.ts</a></em></p>
+<h2 id="psqridentityaddkid"><code>psqr identity:add [KID]</code></h2>
+<p>Add a pre-existing identity to the cli config and create a new key.</p>
+<pre><code>USAGE
   $ psqr identity:add [KID]
 
 ARGUMENTS
@@ -454,16 +391,11 @@ DESCRIPTION
   This assumes the DID is located at the url specified in the KID url string.
   If you have some pre-existing keys that you want to add you can either specify the path to them with --path,
   or pass the entire KeyPair as a JSON string with --stdin.
-```
-
-_See code: [src/commands/identity/add.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/add.ts)_
-
-## `psqr identity:create [KID]`
-
-Create a new identity from a provided KID and add it to the psqr config.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/add.ts">src/commands/identity/add.ts</a></em></p>
+<h2 id="psqridentitycreatekid"><code>psqr identity:create [KID]</code></h2>
+<p>Create a new identity from a provided KID and add it to the psqr config.</p>
+<pre><code>USAGE
   $ psqr identity:create [KID]
 
 ARGUMENTS
@@ -483,16 +415,11 @@ OPTIONS
 
 DESCRIPTION
   This only supports creating did:psqr identities.
-```
-
-_See code: [src/commands/identity/create.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/create.ts)_
-
-## `psqr identity:default [KID]`
-
-Set the default identity using the KID
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/create.ts">src/commands/identity/create.ts</a></em></p>
+<h2 id="psqridentitydefaultkid"><code>psqr identity:default [KID]</code></h2>
+<p>Set the default identity using the KID</p>
+<pre><code>USAGE
   $ psqr identity:default [KID]
 
 ARGUMENTS
@@ -500,16 +427,11 @@ ARGUMENTS
 
 OPTIONS
   -h, --help  show CLI help
-```
-
-_See code: [src/commands/identity/default.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/default.ts)_
-
-## `psqr identity:delete [DID]`
-
-Remove an Identity from a Public Square Network that hosts Identities.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/default.ts">src/commands/identity/default.ts</a></em></p>
+<h2 id="psqridentitydeletedid"><code>psqr identity:delete [DID]</code></h2>
+<p>Remove an Identity from a Public Square Network that hosts Identities.</p>
+<pre><code>USAGE
   $ psqr identity:delete [DID]
 
 ARGUMENTS
@@ -517,16 +439,11 @@ ARGUMENTS
 
 OPTIONS
   -h, --help  show CLI help
-```
-
-_See code: [src/commands/identity/delete.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/delete.ts)_
-
-## `psqr identity:export [DID]`
-
-Export the did doc of an identity.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/delete.ts">src/commands/identity/delete.ts</a></em></p>
+<h2 id="psqridentityexportdid"><code>psqr identity:export [DID]</code></h2>
+<p>Export the did doc of an identity.</p>
+<pre><code>USAGE
   $ psqr identity:export [DID]
 
 ARGUMENTS
@@ -539,16 +456,11 @@ OPTIONS
 
 DESCRIPTION
   If you wish to export your stored private keys you need to specify each key by name.
-```
-
-_See code: [src/commands/identity/export.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/export.ts)_
-
-## `psqr identity:new [KID]`
-
-Create a new default identity
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/export.ts">src/commands/identity/export.ts</a></em></p>
+<h2 id="psqridentitynewkid"><code>psqr identity:new [KID]</code></h2>
+<p>Create a new default identity</p>
+<pre><code>USAGE
   $ psqr identity:new [KID]
 
 ARGUMENTS
@@ -568,16 +480,11 @@ DESCRIPTION
   This command creates a new identity from a provided KID URL,
   adds it to the psqr config, and sets it as the default.
   This only supports creating did:psqr identities.
-```
-
-_See code: [src/commands/identity/new.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/new.ts)_
-
-## `psqr identity:propagate [DID]`
-
-Propagate an Identity to a Public Square Network that hosts Identities.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/new.ts">src/commands/identity/new.ts</a></em></p>
+<h2 id="psqridentitypropagatedid"><code>psqr identity:propagate [DID]</code></h2>
+<p>Propagate an Identity to a Public Square Network that hosts Identities.</p>
+<pre><code>USAGE
   $ psqr identity:propagate [DID]
 
 ARGUMENTS
@@ -588,16 +495,11 @@ OPTIONS
 
 DESCRIPTION
   It will use any available admin key associated with the identity or it will throw an error if none are available.
-```
-
-_See code: [src/commands/identity/propagate.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/propagate.ts)_
-
-## `psqr identity:resolve [DID]`
-
-For Self Hosting the Identity, find the local file and the URL that must serve it.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/propagate.ts">src/commands/identity/propagate.ts</a></em></p>
+<h2 id="psqridentityresolvedid"><code>psqr identity:resolve [DID]</code></h2>
+<p>For Self Hosting the Identity, find the local file and the URL that must serve it.</p>
+<pre><code>USAGE
   $ psqr identity:resolve [DID]
 
 ARGUMENTS
@@ -605,16 +507,11 @@ ARGUMENTS
 
 OPTIONS
   -h, --help  show CLI help
-```
-
-_See code: [src/commands/identity/resolve.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/resolve.ts)_
-
-## `psqr identity:validate [KID] [PATH]`
-
-Validate an identity (DID doc and key pair)
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/resolve.ts">src/commands/identity/resolve.ts</a></em></p>
+<h2 id="psqridentityvalidatekidpath"><code>psqr identity:validate [KID] [PATH]</code></h2>
+<p>Validate an identity (DID doc and key pair)</p>
+<pre><code>USAGE
   $ psqr identity:validate [KID] [PATH]
 
 ARGUMENTS
@@ -628,16 +525,11 @@ OPTIONS
   -h, --help      show CLI help
   -r, --raw       Key PATH specified is raw (not a filepath), you need to escape "
   -s, --stdin     Use STDIN input as key instead of key PATH
-```
-
-_See code: [src/commands/identity/validate.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/validate.ts)_
-
-## `psqr key:add [KID]`
-
-Add a pre-existing Key to an identity stored in the cli config.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/validate.ts">src/commands/identity/validate.ts</a></em></p>
+<h2 id="psqrkeyaddkid"><code>psqr key:add [KID]</code></h2>
+<p>Add a pre-existing Key to an identity stored in the cli config.</p>
+<pre><code>USAGE
   $ psqr key:add [KID]
 
 ARGUMENTS
@@ -652,16 +544,11 @@ OPTIONS
 DESCRIPTION
   Specify the path to the directory containing them with --path,
   or pass the entire KeyPair as a JSON string with --stdin.
-```
-
-_See code: [src/commands/key/add.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/key/add.ts)_
-
-## `psqr key:new [DID] [NAMES]`
-
-Create new Keys and add them to a pre-existing identity.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/key/add.ts">src/commands/key/add.ts</a></em></p>
+<h2 id="psqrkeynewdidnames"><code>psqr key:new [DID] [NAMES]</code></h2>
+<p>Create new Keys and add them to a pre-existing identity.</p>
+<pre><code>USAGE
   $ psqr key:new [DID] [NAMES]
 
 ARGUMENTS
@@ -670,16 +557,11 @@ ARGUMENTS
 
 OPTIONS
   -h, --help  show CLI help
-```
-
-_See code: [src/commands/key/new.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/key/new.ts)_
-
-## `psqr network`
-
-List Network config
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/key/new.ts">src/commands/key/new.ts</a></em></p>
+<h2 id="psqrnetwork"><code>psqr network</code></h2>
+<p>List Network config</p>
+<pre><code>USAGE
   $ psqr network
 
 OPTIONS
@@ -691,16 +573,11 @@ OPTIONS
 DESCRIPTION
   Lists the config of the Network(s) as specified by flags.
   Lists the defaults if not otherwise specified.
-```
-
-_See code: [src/commands/network.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network.ts)_
-
-## `psqr network:create [DOMAIN] [NAME]`
-
-Create a new Network config
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network.ts">src/commands/network.ts</a></em></p>
+<h2 id="psqrnetworkcreatedomainname"><code>psqr network:create [DOMAIN] [NAME]</code></h2>
+<p>Create a new Network config</p>
+<pre><code>USAGE
   $ psqr network:create [DOMAIN] [NAME]
 
 ARGUMENTS
@@ -715,16 +592,11 @@ OPTIONS
   -i, --link=link      Url to use instead of link default (link.[domain])
   -l, --list=list      Url to use instead of list default (list.[domain])
   -s, --search=search  Url to use instead of search default (search.[domain])
-```
-
-_See code: [src/commands/network/create.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network/create.ts)_
-
-## `psqr network:default [DOMAINS]`
-
-Set the default Network(s)
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network/create.ts">src/commands/network/create.ts</a></em></p>
+<h2 id="psqrnetworkdefaultdomains"><code>psqr network:default [DOMAINS]</code></h2>
+<p>Set the default Network(s)</p>
+<pre><code>USAGE
   $ psqr network:default [DOMAINS]
 
 ARGUMENTS
@@ -736,16 +608,11 @@ OPTIONS
 
 DESCRIPTION
   Default behavior is to add specified Network(s) to defaults.
-```
-
-_See code: [src/commands/network/default.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network/default.ts)_
-
-## `psqr network:remove [DOMAINS]`
-
-Remove Network configs
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network/default.ts">src/commands/network/default.ts</a></em></p>
+<h2 id="psqrnetworkremovedomains"><code>psqr network:remove [DOMAINS]</code></h2>
+<p>Remove Network configs</p>
+<pre><code>USAGE
   $ psqr network:remove [DOMAINS]
 
 ARGUMENTS
@@ -753,16 +620,11 @@ ARGUMENTS
 
 OPTIONS
   -h, --help  show CLI help
-```
-
-_See code: [src/commands/network/remove.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network/remove.ts)_
-
-## `psqr post [BODY]`
-
-Create post, sign it with specified key, and publish to Broadcaster
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network/remove.ts">src/commands/network/remove.ts</a></em></p>
+<h2 id="psqrpostbody"><code>psqr post [BODY]</code></h2>
+<p>Create post, sign it with specified key, and publish to Broadcaster</p>
+<pre><code>USAGE
   $ psqr post [BODY]
 
 ARGUMENTS
@@ -782,16 +644,11 @@ OPTIONS
   -r, --raw                                        DATA specified is raw (not a filepath), you need to escape "
   -s, --stdin                                      Use STDIN input as DATA
   -t, --title=title                                Post title
-```
-
-_See code: [src/commands/post.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post.ts)_
-
-## `psqr post:create [BODY]`
-
-Create Post JSON with input data
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post.ts">src/commands/post.ts</a></em></p>
+<h2 id="psqrpostcreatebody"><code>psqr post:create [BODY]</code></h2>
+<p>Create Post JSON with input data</p>
+<pre><code>USAGE
   $ psqr post:create [BODY]
 
 ARGUMENTS
@@ -810,16 +667,11 @@ OPTIONS
   -r, --raw                                        DATA specified is raw (not a filepath), you need to escape "
   -s, --stdin                                      Use STDIN input as DATA
   -t, --title=title                                Post title
-```
-
-_See code: [src/commands/post/create.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post/create.ts)_
-
-## `psqr post:put [HASH] [DATA]`
-
-Publish content to the specified Broadcaster
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post/create.ts">src/commands/post/create.ts</a></em></p>
+<h2 id="psqrpostputhashdata"><code>psqr post:put [HASH] [DATA]</code></h2>
+<p>Publish content to the specified Broadcaster</p>
+<pre><code>USAGE
   $ psqr post:put [HASH] [DATA]
 
 ARGUMENTS
@@ -835,16 +687,11 @@ OPTIONS
   -r, --raw                        DATA specified is raw (not a filepath), you need to escape "
 
   -s, --stdin                      Use STDIN input as DATA
-```
-
-_See code: [src/commands/post/put.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post/put.ts)_
-
-## `psqr post:sign [DATA]`
-
-Parse post JSON and sign it with specified key
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post/put.ts">src/commands/post/put.ts</a></em></p>
+<h2 id="psqrpostsigndata"><code>psqr post:sign [DATA]</code></h2>
+<p>Parse post JSON and sign it with specified key</p>
+<pre><code>USAGE
   $ psqr post:sign [DATA]
 
 ARGUMENTS
@@ -855,16 +702,11 @@ OPTIONS
   -k, --kid=kid  KID string
   -r, --raw      DATA specified is raw (not a filepath), you need to escape "
   -s, --stdin    Use STDIN input as DATA
-```
-
-_See code: [src/commands/post/sign.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post/sign.ts)_
-
-## `psqr search [QUERY]`
-
-Search ElasticSearch for a specific string
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post/sign.ts">src/commands/post/sign.ts</a></em></p>
+<h2 id="psqrsearchquery"><code>psqr search [QUERY]</code></h2>
+<p>Search ElasticSearch for a specific string</p>
+<pre><code>USAGE
   $ psqr search [QUERY]
 
 ARGUMENTS
@@ -877,16 +719,11 @@ OPTIONS
   -m, --nometa             Remove metainfo from the response object
   -p, --page=page          ElasticSearch page to query, defaults to 1
   -r, --raw                Output only the raw responses
-```
-
-_See code: [src/commands/search.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/search.ts)_
-
-## `psqr setup`
-
-This utility will prompt you for the all of the necessary info to get your environment up and running.
-
-```
-USAGE
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/search.ts">src/commands/search.ts</a></em></p>
+<h2 id="psqrsetup"><code>psqr setup</code></h2>
+<p>This utility will prompt you for the all of the necessary info to get your environment up and running.</p>
+<pre><code>USAGE
   $ psqr setup
 
 OPTIONS
@@ -894,7 +731,11 @@ OPTIONS
 
 DESCRIPTION
   It will set up your identity, keys, necessary networking, and any content crawling configuration you may need.
-```
-
-_See code: [src/commands/setup.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/setup.ts)_
+</code></pre>
+<p><em>See code: <a href="https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/setup.ts">src/commands/setup.ts</a></em></p>
 <!-- commandsstop -->
+    </section>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.2/mdb.min.js"></script>
+</body>
+</html>

@@ -3,35 +3,78 @@
   "description": "NodeJS CLI client for Virtual Public Squares.",
   "version": "0.0.0",
   "author": "Virtual Public Square (protocol@vpsqr.com)",
-  "bugs": "https://github.com/public-square/psqr/issues",
+  "bin": {
+    "psqr": "./bin/run"
+  },
+  "bugs": "https://github.com/newpress/public-square-client-cli/issues",
   "devDependencies": {
-    "@types/node": "^10.17.60",
-    "eslint": "^7.32.0",
-    "eslint-config-oclif": "^3.1.2",
-    "eslint-config-oclif-typescript": "^0.2.0",
+    "@types/node": "^10.17.56",
+    "devextreme-showdown": "^1.0.1",
+    "eslint": "^5.16.0",
+    "eslint-config-oclif": "^3.1.0",
+    "eslint-config-oclif-typescript": "^0.1.0",
+    "globby": "^10.0.2",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.10"
+    "typescript": "^3.9.9"
   },
   "engines": {
     "node": ">=12.0.0"
   },
   "files": [
-    "/lib"
+    "/bin",
+    "/lib",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/public-square/psqr",
+  "homepage": "https://github.com/newpress/public-square-client-cli",
   "keywords": [
-    "oclif"
+    "oclif",
+    "psqr",
+    "Public Square Network"
   ],
   "license": "MIT",
   "main": "lib/index.js",
-  "repository": "public-square/psqr",
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "psqr",
+    "plugins": [
+      "@oclif/plugin-help"
+    ],
+    "hooks": {
+      "init": "./src/hooks/defaults"
+    }
+  },
+  "repository": "newpress/public-square-client-cli",
   "scripts": {
-    "posttest": "eslint . --ext .ts --config .eslintrc",
-    "prepack": "rm -rf lib && tsc -b",
-    "test": "echo NO TESTS"
+    "postpack": "rm -f oclif.manifest.json",
+    "posttest": "eslint . --ext .ts --config .eslintrc.json -f table",
+    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "test": "echo NO TESTS",
+    "version": "npx @oclif/dev-cli readme && node ./generate-doc-html.js && git add README.md README.html",
+    "generateDocs": "npx @oclif/dev-cli readme && node ./generate-doc-html.js"
   },
   "types": "lib/index.d.ts",
   "dependencies": {
-    "tslib": "^1.14.1"
+    "@oclif/command": "^1.8.0",
+    "@oclif/config": "^1.17.0",
+    "@oclif/core": "^1.6.3",
+    "@oclif/plugin-help": "^3.2.2",
+    "@public-square/sitemapper": "^3.2.4",
+    "axios": "^0.21.1",
+    "bencode": "^2.0.1",
+    "chalk": "^2.4.2",
+    "dotenv": "^8.2.0",
+    "get-stdin": "^8.0.0",
+    "https-proxy-agent": "^5.0.0",
+    "inquirer": "^8.2.1",
+    "jose": "^3.14.0",
+    "open-graph-scraper": "^4.9.1",
+    "ora": "^5.4.0",
+    "parse-duration": "^1.0.0",
+    "read-last-lines": "^1.8.0",
+    "rss-parser": "^3.12.0",
+    "runtypes": "^6.3.1",
+    "tslib": "^1.14.1",
+    "webhoseio": "^1.0.2"
   }
 }

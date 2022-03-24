@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+// const ora = require('ora');
+
+// global.oraSetup = ora('Preparing command...\n').start();
+
+require('@oclif/command').run()
+.then(require('@oclif/command/flush'))
+.catch(require('@oclif/errors/handle'))
