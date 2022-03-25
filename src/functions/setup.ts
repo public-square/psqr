@@ -8,7 +8,8 @@ import { Identity, KeyPair, PublicInfo } from '../types/identity';
 import { NetworkConfig } from '../types/network';
 import { createNetworkConfig, setDefaultNetwork } from './network';
 import { crawlTypes, CrawlType, writeRSSCrawl, writeSitemapCrawl, writeTwitterCrawl, writeWebhoseCrawl, setDefaultCrawl } from './crawl';
-import { Crawl, RSS, Sitemap, Twitter, Webhose } from '../types/crawl';
+import { RSS, Sitemap, Twitter, Webhose } from '../types/crawl';
+import { DID_PSQR } from '../types/base-types';
 
 const inquirer = require('inquirer');
 
@@ -48,7 +49,18 @@ async function promptIdentitySetup(): Promise<any> {
                 {
                     type: 'input',
                     name: 'did',
-                    message: 'What is the DID string of the identity you are adding?'
+                    message: 'What is the DID string of the identity you are adding? Expected format: did:psqr:{hostname}/{path}',
+                    validate: (did: string) => {
+                        // verify that the did supplied is valid
+                        try {
+                            DID_PSQR.check(did);
+                        } catch (error) {
+                            const msg = handleRuntypeFail(error);
+                            return msg
+                        }
+
+                        return true;
+                    }
                 },
                 {
                     type: 'list',
@@ -91,7 +103,18 @@ async function promptIdentitySetup(): Promise<any> {
                 {
                     type: 'input',
                     name: 'did',
-                    message: 'What is the DID string of the Identity you are creating?'
+                    message: 'What is the DID string of the Identity you are creating? Expected format: did:psqr:{hostname}/{path}',
+                    validate: (did: string) => {
+                        // verify that the did supplied is valid
+                        try {
+                            DID_PSQR.check(did);
+                        } catch (error) {
+                            const msg = handleRuntypeFail(error);
+                            return msg
+                        }
+
+                        return true;
+                    }
                 },
                 {
                     type: 'input',

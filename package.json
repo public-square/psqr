@@ -41,7 +41,7 @@
       "@oclif/plugin-help"
     ],
     "hooks": {
-      "init": "./src/hooks/defaults"
+      "init": "./lib/hooks/defaults"
     }
   },
   "repository": "newpress/public-square-client-cli",
@@ -74,7 +74,6 @@
     "read-last-lines": "^1.8.0",
     "rss-parser": "^3.12.0",
     "runtypes": "^6.3.1",
-    "tslib": "^1.14.1",
-    "webhoseio": "^1.0.2"
+    "tslib": "^1.14.1"
   }
 }
