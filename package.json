@@ -1,7 +1,7 @@
 {
   "name": "psqr",
   "description": "NodeJS CLI client for Virtual Public Squares.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Virtual Public Square (protocol@vpsqr.com)",
   "bin": {
     "psqr": "./bin/run"

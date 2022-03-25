@@ -19,7 +19,7 @@ $ npm install -g psqr
 $ psqr COMMAND
 running command...
 $ psqr (-v|--version|version)
-psqr/0.1.0 linux-x64 node-v16.2.0
+psqr/0.1.1 linux-x64 node-v16.2.0
 $ psqr --help [COMMAND]
 USAGE
   $ psqr COMMAND
@@ -81,7 +81,7 @@ OPTIONS
   -n, --network=network  domain of network to export instead of using default
 ```
 
-_See code: [src/commands/config/export.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/config/export.ts)_
+_See code: [src/commands/config/export.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/config/export.ts)_
 
 ## `psqr config:import [PATH]`
 
@@ -100,7 +100,7 @@ OPTIONS
   -h, --help     show CLI help
 ```
 
-_See code: [src/commands/config/import.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/config/import.ts)_
+_See code: [src/commands/config/import.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/config/import.ts)_
 
 ## `psqr crawl [TYPE] [DID]`
 
@@ -130,7 +130,7 @@ DESCRIPTION
   If you want to crawl multiple configs use stdin or set them as the defaults.
 ```
 
-_See code: [src/commands/crawl.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl.ts)_
+_See code: [src/commands/crawl.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/crawl.ts)_
 
 ## `psqr crawl:add:rss [KID] [URL]`
 
@@ -152,7 +152,7 @@ OPTIONS
   -p, --politicalSubdivision=politicalSubdivision  Specify the default politicalSubdivision value
 ```
 
-_See code: [src/commands/crawl/add/rss.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/rss.ts)_
+_See code: [src/commands/crawl/add/rss.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/crawl/add/rss.ts)_
 
 ## `psqr crawl:add:sitemap [KID] [URL]`
 
@@ -195,7 +195,7 @@ OPTIONS
   -t, --filterTitle=filterTitle                    List of titles to never use divided by the pipe symbol (|).
 ```
 
-_See code: [src/commands/crawl/add/sitemap.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/sitemap.ts)_
+_See code: [src/commands/crawl/add/sitemap.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/crawl/add/sitemap.ts)_
 
 ## `psqr crawl:add:twitter [KID] [USERNAME]`
 
@@ -217,7 +217,7 @@ OPTIONS
   -p, --politicalSubdivision=politicalSubdivision  Specify the default politicalSubdivision value
 ```
 
-_See code: [src/commands/crawl/add/twitter.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/twitter.ts)_
+_See code: [src/commands/crawl/add/twitter.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/crawl/add/twitter.ts)_
 
 ## `psqr crawl:add:webhose [KID] [USERNAME]`
 
@@ -240,7 +240,7 @@ OPTIONS
   -p, --politicalSubdivision=politicalSubdivision  Specify the default politicalSubdivision value
 ```
 
-_See code: [src/commands/crawl/add/webhose.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/add/webhose.ts)_
+_See code: [src/commands/crawl/add/webhose.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/crawl/add/webhose.ts)_
 
 ## `psqr crawl:default [TYPE] [DID]`
 
@@ -263,7 +263,7 @@ DESCRIPTION
   Default behavior is to add specified Crawl(s) to defaults.
 ```
 
-_See code: [src/commands/crawl/default.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/default.ts)_
+_See code: [src/commands/crawl/default.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/crawl/default.ts)_
 
 ## `psqr crawl:publish [TYPE] [DID]`
 
@@ -292,7 +292,7 @@ DESCRIPTION
   published to the broadcasters, and then deleted unless otherwise specified.
 ```
 
-_See code: [src/commands/crawl/publish.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/publish.ts)_
+_See code: [src/commands/crawl/publish.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/crawl/publish.ts)_
 
 ## `psqr crawl:pull [TYPE] [DID]`
 
@@ -319,7 +319,7 @@ DESCRIPTION
   or locally if specified.
 ```
 
-_See code: [src/commands/crawl/pull.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/pull.ts)_
+_See code: [src/commands/crawl/pull.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/crawl/pull.ts)_
 
 ## `psqr crawl:remove [TYPE] [DID]`
 
@@ -338,7 +338,7 @@ OPTIONS
   -s, --stdin  Use STDIN input as a list of newline separated DIDs.
 ```
 
-_See code: [src/commands/crawl/remove.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/remove.ts)_
+_See code: [src/commands/crawl/remove.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/crawl/remove.ts)_
 
 ## `psqr crawl:test [TYPE] [DID]`
 
@@ -367,7 +367,7 @@ DESCRIPTION
   depending on options selected.
 ```
 
-_See code: [src/commands/crawl/test.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/crawl/test.ts)_
+_See code: [src/commands/crawl/test.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/crawl/test.ts)_
 
 ## `psqr env [FILE]`
 
@@ -388,7 +388,7 @@ OPTIONS
   -s, --set=set   Set and save specific env vars. Format is comma separated key=value
 ```
 
-_See code: [src/commands/env.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/env.ts)_
+_See code: [src/commands/env.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/env.ts)_
 
 ## `psqr help [COMMAND]`
 
@@ -428,7 +428,7 @@ DESCRIPTION
   This command lists the identities that are currently saved and available.
 ```
 
-_See code: [src/commands/identity.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity.ts)_
+_See code: [src/commands/identity.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/identity.ts)_
 
 ## `psqr identity:add [KID]`
 
@@ -456,7 +456,7 @@ DESCRIPTION
   or pass the entire KeyPair as a JSON string with --stdin.
 ```
 
-_See code: [src/commands/identity/add.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/add.ts)_
+_See code: [src/commands/identity/add.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/identity/add.ts)_
 
 ## `psqr identity:create [KID]`
 
@@ -485,7 +485,7 @@ DESCRIPTION
   This only supports creating did:psqr identities.
 ```
 
-_See code: [src/commands/identity/create.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/create.ts)_
+_See code: [src/commands/identity/create.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/identity/create.ts)_
 
 ## `psqr identity:default [KID]`
 
@@ -502,7 +502,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/identity/default.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/default.ts)_
+_See code: [src/commands/identity/default.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/identity/default.ts)_
 
 ## `psqr identity:delete [DID]`
 
@@ -519,7 +519,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/identity/delete.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/delete.ts)_
+_See code: [src/commands/identity/delete.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/identity/delete.ts)_
 
 ## `psqr identity:export [DID]`
 
@@ -541,7 +541,7 @@ DESCRIPTION
   If you wish to export your stored private keys you need to specify each key by name.
 ```
 
-_See code: [src/commands/identity/export.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/export.ts)_
+_See code: [src/commands/identity/export.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/identity/export.ts)_
 
 ## `psqr identity:new [KID]`
 
@@ -570,7 +570,7 @@ DESCRIPTION
   This only supports creating did:psqr identities.
 ```
 
-_See code: [src/commands/identity/new.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/new.ts)_
+_See code: [src/commands/identity/new.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/identity/new.ts)_
 
 ## `psqr identity:propagate [DID]`
 
@@ -590,7 +590,7 @@ DESCRIPTION
   It will use any available admin key associated with the identity or it will throw an error if none are available.
 ```
 
-_See code: [src/commands/identity/propagate.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/propagate.ts)_
+_See code: [src/commands/identity/propagate.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/identity/propagate.ts)_
 
 ## `psqr identity:resolve [DID]`
 
@@ -607,7 +607,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/identity/resolve.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/resolve.ts)_
+_See code: [src/commands/identity/resolve.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/identity/resolve.ts)_
 
 ## `psqr identity:validate [KID] [PATH]`
 
@@ -630,7 +630,7 @@ OPTIONS
   -s, --stdin     Use STDIN input as key instead of key PATH
 ```
 
-_See code: [src/commands/identity/validate.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/identity/validate.ts)_
+_See code: [src/commands/identity/validate.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/identity/validate.ts)_
 
 ## `psqr key:add [KID]`
 
@@ -654,7 +654,7 @@ DESCRIPTION
   or pass the entire KeyPair as a JSON string with --stdin.
 ```
 
-_See code: [src/commands/key/add.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/key/add.ts)_
+_See code: [src/commands/key/add.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/key/add.ts)_
 
 ## `psqr key:new [DID] [NAMES]`
 
@@ -672,7 +672,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/key/new.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/key/new.ts)_
+_See code: [src/commands/key/new.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/key/new.ts)_
 
 ## `psqr network`
 
@@ -693,7 +693,7 @@ DESCRIPTION
   Lists the defaults if not otherwise specified.
 ```
 
-_See code: [src/commands/network.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network.ts)_
+_See code: [src/commands/network.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/network.ts)_
 
 ## `psqr network:create [DOMAIN] [NAME]`
 
@@ -717,7 +717,7 @@ OPTIONS
   -s, --search=search  Url to use instead of search default (search.[domain])
 ```
 
-_See code: [src/commands/network/create.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network/create.ts)_
+_See code: [src/commands/network/create.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/network/create.ts)_
 
 ## `psqr network:default [DOMAINS]`
 
@@ -738,7 +738,7 @@ DESCRIPTION
   Default behavior is to add specified Network(s) to defaults.
 ```
 
-_See code: [src/commands/network/default.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network/default.ts)_
+_See code: [src/commands/network/default.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/network/default.ts)_
 
 ## `psqr network:remove [DOMAINS]`
 
@@ -755,7 +755,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/network/remove.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/network/remove.ts)_
+_See code: [src/commands/network/remove.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/network/remove.ts)_
 
 ## `psqr post [BODY]`
 
@@ -784,7 +784,7 @@ OPTIONS
   -t, --title=title                                Post title
 ```
 
-_See code: [src/commands/post.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post.ts)_
+_See code: [src/commands/post.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/post.ts)_
 
 ## `psqr post:create [BODY]`
 
@@ -812,7 +812,7 @@ OPTIONS
   -t, --title=title                                Post title
 ```
 
-_See code: [src/commands/post/create.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post/create.ts)_
+_See code: [src/commands/post/create.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/post/create.ts)_
 
 ## `psqr post:put [HASH] [DATA]`
 
@@ -837,7 +837,7 @@ OPTIONS
   -s, --stdin                      Use STDIN input as DATA
 ```
 
-_See code: [src/commands/post/put.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post/put.ts)_
+_See code: [src/commands/post/put.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/post/put.ts)_
 
 ## `psqr post:sign [DATA]`
 
@@ -857,7 +857,7 @@ OPTIONS
   -s, --stdin    Use STDIN input as DATA
 ```
 
-_See code: [src/commands/post/sign.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/post/sign.ts)_
+_See code: [src/commands/post/sign.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/post/sign.ts)_
 
 ## `psqr search [QUERY]`
 
@@ -879,7 +879,7 @@ OPTIONS
   -r, --raw                Output only the raw responses
 ```
 
-_See code: [src/commands/search.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/search.ts)_
+_See code: [src/commands/search.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/search.ts)_
 
 ## `psqr setup`
 
@@ -896,5 +896,5 @@ DESCRIPTION
   It will set up your identity, keys, necessary networking, and any content crawling configuration you may need.
 ```
 
-_See code: [src/commands/setup.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.0/src/commands/setup.ts)_
+_See code: [src/commands/setup.ts](https://github.com/newpress/public-square-client-cli/blob/v0.1.1/src/commands/setup.ts)_
 <!-- commandsstop -->
