@@ -1,15 +1,22 @@
 import { Command, flags, run as runCommand } from '@oclif/command'
 import { Static } from 'runtypes';
 
-import { addExistingKeyPair, getDid, parseBareDid, parseKidKey, validateIdentity } from '../../functions/identity';
+import { addExistingKeyPair, getDid, getKeyPair, parseBareDid, parseKidKey, validateIdentity } from '../../functions/identity';
 import { handleRuntypeFail, FileConfig, retrieveFiles } from '../../functions/utility';
+import { KID_PSQR } from '../../types/base-types';
 import { KeyPair, Identity } from '../../types/identity';
 
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Validates an identity (DID Document and Key Pair).
+ */
 export default class IdentityValidate extends Command {
-    static description = 'Validate an identity (DID doc and key pair)'
+    static description = `Validate an identity (DID doc and key pair)
+Use the import flag to import the key into the local identity as well.
+If no key path is specified and no stdin input is provided then this will fallback to checking in the local directory of the identity.
+`
 
     static flags = {
         help: flags.help({ char: 'h' }),
@@ -21,7 +28,7 @@ export default class IdentityValidate extends Command {
     static args = [
         {
             name: 'kid',
-            description: 'KID URL string, expected format: did:(psqr|web):{hostname}(/|:){path}#{keyId}',
+            description: 'KID PSQR string, expected format: did:(psqr|web):{hostname}(/|:){path}#{keyId}',
         },
         {
             name: 'path',
@@ -34,14 +41,21 @@ export default class IdentityValidate extends Command {
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.kid === null || (args.path === null && flags.stdin !== true)) {
+        if (typeof args.kid === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['identity:validate', '-h']);
         }
 
-        const kid = args.kid;
+        // validate and assign kid
         const path = args.path;
+        let kid: Static<typeof KID_PSQR>;
+        try {
+            kid = KID_PSQR.check(args.kid);
+        } catch (error) {
+            oraStart.fail('Invalid KID PSQR string specified, expected format: did:psqr:{hostname}/{path}#{keyId}');
+            return false;
+        }
 
         oraStart.succeed('Command ready')
         const oraRun = ora('Validating Identity...').start();
@@ -84,6 +98,16 @@ export default class IdentityValidate extends Command {
                 }
                 break;
             }
+            case typeof path === 'undefined': {
+                // get local keys if path is undefined
+                const localResult = await getKeyPair(kid);
+                if (localResult.success === false) {
+                    return oraRun.fail('Unable to retrieve local key because: ' + localResult.message);
+                }
+
+                keyPair = localResult.keyPairs[0];
+                break;
+            }
             case flags.raw: {
                 // assemble and validate key pair from raw
                 try {
@@ -112,10 +136,11 @@ export default class IdentityValidate extends Command {
                 if (kfResp.success === false) return oraRun.fail('Unable to find keys at ' + path)
 
                 // separate out key files
-                let privKey, pubKey;
+                let privKey;
+                let pubKey;
                 for (let i = 0; i < kfResp.files.length; i++) {
                     const f = kfResp.files[i];
-                    
+
                     if (typeof f === 'string' || typeof f.data !== 'string') continue;
                     if (f.path.includes(privPath)) {
                         privKey = f.data;

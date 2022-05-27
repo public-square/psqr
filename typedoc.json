@@ -1,0 +1,22 @@
+{
+    "tsconfig": "tsconfig.json",
+    "entryPoints": [
+        "./src"
+    ],
+    "entryPointStrategy": "Expand",
+    "exclude": [
+        "./src/*.ts"
+    ],
+    "excludeExternals": true,
+    "disableSources": true,
+    "out": "docs",
+    "theme": "default",
+    "name": "PublicSquare CLI",
+    "includeVersion": true,
+    "readme": "none",
+    "categorizeByGroup": true,
+    "githubPages": false,
+    "hideGenerator": true,
+    "plugin": "none",
+    "treatWarningsAsErrors": true
+}

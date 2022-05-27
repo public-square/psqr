@@ -1,28 +1,38 @@
 // @ts-ignore: rmSync is available despite warnings
 import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync } from 'fs';
-
 import { createHash } from 'crypto';
-
 import { Static } from 'runtypes';
-
-import { generateKeyPair } from 'jose/util/generate_key_pair';
-import { fromKeyLike } from 'jose/jwk/from_key_like';
+import { generateKeyPair, exportJWK } from 'jose';
+import { Resolver, parse as parseDid } from 'did-resolver'
+import { getResolver as getWebResolver } from 'web-did-resolver'
+import { getResolver as getPsqrResolver } from 'psqr-did-resolver'
 
 import { getVars, setVars } from './env';
 import { runtypeCheck, verifyKeyPairs } from './validate';
 import { PublicKey, PrivateKey, Did, PublicInfo, Identity, KeyPair } from '../types/identity';
 import { DataResponse } from '../types/interfaces';
-import { createFiles, retrieveFiles, handleRuntypeFail, FileConfig, FileResponse, retrieveRegFiles } from '../functions/utility';
-import { KID, Url } from '../types/base-types';
+import { createFiles, retrieveFiles, handleRuntypeFail, FileConfig, FileResponse, retrieveRegFiles } from './utility';
+import { DID, KID, Url } from '../types/base-types';
+import { getNetworkConfig } from './network';
+import { NetworkConfig } from '../types/network';
 
 const bencode = require('bencode');
 
 const axios = require('axios').default;
 const homedir = require('os').homedir();
 
+// setup did resolver methods
+const webResolver = getWebResolver();
+const psqrResolver = getPsqrResolver();
+const didResolver = new Resolver({
+    ...webResolver,
+    ...psqrResolver
+})
+
 const IDENTITY_PATH = `${homedir}/.config/psqr/identities`;
 
-type DidResponse = {
+/** Success or Failure DID Message Response */
+export type DidResponse = {
     success: true;
     didDoc: Static<typeof Did>;
 } | {
@@ -30,14 +40,16 @@ type DidResponse = {
     error: Error;
 }
 
-interface KeyFile {
+/** Key File containing Private and Public Keys */
+export interface KeyFile {
     kid: Static<typeof KID>;
     relative: boolean;
     publicFile?: string;
     privateFile: string;
 }
 
-type KeyPairsResponse = {
+/** Success or Failure Key Pair Response Message */
+export type KeyPairsResponse = {
     success: true;
     message: string;
     keyPairs: Static<typeof KeyPair>[];
@@ -56,6 +68,7 @@ interface PathResponse extends DataResponse {
     };
 }
 
+/** Success or Failure Identity Response Message */
 export type IdentityResponse = {
     success: true;
     message: string;
@@ -66,10 +79,10 @@ export type IdentityResponse = {
 }
 
 /**
- * Validate a provided Identity.
+ * Validate an Identity.
  *
  * @param identity obj containing identity to use
- * @returns outcome of identity validation including valid identity obj
+ * @returns Success or Failure Message Response of identity validation including valid identity object
  */
 async function validateIdentity(identity: Static<typeof Identity>): Promise<IdentityResponse> {
     try {
@@ -142,21 +155,21 @@ async function validateIdentity(identity: Static<typeof Identity>): Promise<Iden
         }
 
         return { success: true, message: msg, identity }
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
-        return { success: false, message: msg }
+        return { success: false, message: 'Error validating identity: ' + msg }
     }
 }
 
 /**
  * Create a completely new Identity.
- * If key names aren't specified this will attempt to get the key name
+ * If key names aren't specified, this will attempt to get the key name
  * from the kid and fall back on the name 'publish'.
  *
  * @param kid did with trailing key name
  * @param info public info obj to be included in DID
  * @param keyNames list of names of keys to be included
- * @returns outcome of attempt including full identity
+ * @returns Success or Failure Message Response including full identity
  */
 async function createIdentity(kid: string, info: Static<typeof PublicInfo>, keyNames: string[] = []): Promise<IdentityResponse> {
     const did = parseBareDid(kid);
@@ -194,17 +207,17 @@ async function createIdentity(kid: string, info: Static<typeof PublicInfo>, keyN
         };
 
         return response;
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
 }
 
 /**
- * Save an identity to psqr config dir to use.
+ * Save an identity to psqr configuration directory for use.
  *
  * @param identity obj containing identity to add
- * @returns outcome of attempt
+ * @returns Success or Failure Message Response
  */
 async function addIdentity(identity: Static<typeof Identity>): Promise<DataResponse> {
     // add a key if there are no provided keys
@@ -260,7 +273,7 @@ async function addIdentity(identity: Static<typeof Identity>): Promise<DataRespo
         if (nf.success === false) return { success: false, message: 'Unable to save keys: ' + nf.message }
 
         return { success: true, message: `Successfully added ${did} as an identity` }
-    } catch (error) {
+    } catch (error: any) {
         return { success: false, message: error.message }
     }
 }
@@ -268,7 +281,7 @@ async function addIdentity(identity: Static<typeof Identity>): Promise<DataRespo
 /**
  * Get the current default id strings from the ENV
  *
- * @returns outcome including bdid, kname, and kid
+ * @returns Success or Failure Message Response including bdid, kname, and kid
  */
 function getDefaultIds(): DataResponse {
     const defVars = getVars(['DEFAULT_DID', 'DEFAULT_KEY']);
@@ -300,13 +313,13 @@ function getDefaultIds(): DataResponse {
 }
 
 /**
- * Get identity stored locally.
- * If no kid is specified the default identity will be
+ * Get locally stored identity.
+ * If no kid is specified, the default identity will be
  * retrieved and returned.
- * Exclude trailing #keyName for no keys.
+ * This function will exclude trailing #keyName for no keys.
  *
  * @param kid did with trailing key name
- * @returns outcome of request including identity object
+ * @returns Success or Failure Message Response including identity object
  */
 async function getIdentity(kid = ''): Promise<IdentityResponse> {
     const didErr: IdentityResponse = {
@@ -364,19 +377,19 @@ async function getIdentity(kid = ''): Promise<IdentityResponse> {
             message: `Successfully retrieved identity for ${kid}`,
             identity,
         }
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
 }
 
 /**
- * Get full identity stored locally, including all associated keys
- * If no kid is specified the default identity will be
+ * Get the full identity that is stored locally, including all associated keys present.
+ * If no kid is specified, the default identity will be
  * retrieved and returned.
  *
  * @param did string identifying a DID
- * @returns outcome of request including identity object
+ * @returns Success or Failure Message Response including identity object
  */
 async function getFullIdentity(did = ''): Promise<IdentityResponse> {
     const didErr: IdentityResponse = {
@@ -432,17 +445,17 @@ async function getFullIdentity(did = ''): Promise<IdentityResponse> {
             message: `Successfully retrieved identity and all keys for ${did}`,
             identity,
         }
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
 }
 
 /**
- * Check for identity and then set as default in ENV
+ * Validate an Identity and set it as default in ENV
  *
  * @param kid did with trailing key name
- * @returns outcome of attempt to set default
+ * @returns Success or Failure Message Response to set default
  */
 function setDefaultIdentity(kid: string): DataResponse {
     // get paths, this also checks to be sure they exist
@@ -459,12 +472,12 @@ function setDefaultIdentity(kid: string): DataResponse {
 }
 
 /**
- * If DID is already present locally, get and return that.
- * If not get DID from url in did string, save locally,
- * and return it.
+ * If DID is already present locally, get and return it.
+ * If not, get DID from the url in the did parameter string and save it locally.
+ * Return the full DID.
  *
  * @param did string identifying a DID
- * @returns outcome of request including full DID
+ * @returns Success or Failure Message Response including full DID
  */
 async function getDid(did: string): Promise<DidResponse> {
     const didErr: DidResponse = {
@@ -486,28 +499,15 @@ async function getDid(did: string): Promise<DidResponse> {
             const dir = didPath.replace('/identity.json', '');
             if (existsSync(dir) === false) mkdirSync(dir, { recursive: true });
 
-            // get url for DID
-            const url = parseDidUrl(bdid);
-            if (url === false) return didErr;
-
-            // retrieve DID based on type
-            let didDoc
-            if (didType === 'web') {
-                // retrieve and validate DID from url
-                const response = await axios.get(url);
-                didDoc = Did.check(response.data);
-            } else {
-                // set required accept headers
-                const config = {
-                    headers: {
-                        'accept': 'application/json,application/did+json'
-                    }
+            // retrieve DID using resolver
+            const response = await didResolver.resolve(bdid);
+            if (response.didDocument === null) {
+                return {
+                    success: false,
+                    error: new Error(response.didResolutionMetadata.message)
                 }
-
-                // retrieve and validate DID from url
-                const response = await axios.get(url, config);
-                didDoc = Did.check(response.data);
             }
+            const didDoc = Did.check(response.didDocument);
 
             // create DID local file and return DID
             writeFileSync(didPath, JSON.stringify(didDoc));
@@ -520,18 +520,17 @@ async function getDid(did: string): Promise<DidResponse> {
         const didDoc = Did.check(fileData);
 
         return { success: true, didDoc }
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, error: new TypeError(msg) }
     }
 }
 
 /**
- * Retrieve DID from url regardless of its presence locally
- * and save it locally.
+ * Retrieve DID from url and save it locally.
  *
  * @param did string identifying a DID
- * @returns outcome of request including a full DID
+ * @returns Success or Failure Message Response including a full DID
  */
 async function refreshDid(did: string): Promise<DidResponse> {
     const didErr: DidResponse = {
@@ -555,7 +554,7 @@ async function refreshDid(did: string): Promise<DidResponse> {
         const resp = await getDid(did)
 
         return resp;
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, error: new TypeError(msg) }
     }
@@ -563,10 +562,10 @@ async function refreshDid(did: string): Promise<DidResponse> {
 
 /**
  * Retrieve a pair of keys stored locally.
- * Keys are returned in the JWK format.
+ * Keys are returned in JWK format.
  *
  * @param kid did with trailing key name
- * @returns outcome of request including pair of keys requested as JWKs
+ * @returns Success or Failure Message Response including pair of keys requested as JWKs
  */
 async function getKeyPair(kid: string): Promise<KeyPairsResponse> {
     // get expected path to identity
@@ -584,7 +583,7 @@ async function getKeyPair(kid: string): Promise<KeyPairsResponse> {
         // parse file contents and validate JWK
         privKey = PrivateKey.check(JSON.parse(priv));
         pubKey = PublicKey.check(JSON.parse(pub));
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -607,7 +606,7 @@ async function getKeyPair(kid: string): Promise<KeyPairsResponse> {
 
 /**
  * Retrieve all key pairs stored locally with an identity.
- * Keys are returned in the JWK format.
+ * Keys are returned in JWK format.
  *
  * @param did string identifying a DID
  * @returns false or array of key Pairs
@@ -675,7 +674,7 @@ async function getAllKeyPairs(did: string): Promise<KeyPairsResponse> {
                 private: privKey,
                 public: pubKey,
             })
-        } catch (error) {
+        } catch (error: any) {
             continue
         }
 
@@ -697,14 +696,14 @@ async function getAllKeyPairs(did: string): Promise<KeyPairsResponse> {
 
 /**
  * Create and add a new KeyPair to a provided identity.
- * If keyName isn't specified a name will be parsed from the kid,
- * and finally fallback to 'publish'.
+ * If keyName isn't specified, a name will be parsed from the kid.
+ * This function will fallback to using 'publish' as a key name.
  * This does NOT save the new identity anywhere.
  *
  * @param identity obj containing identity to use
  * @param kid did with trailing key name
  * @param keyName name of key to be added to DID
- * @returns outcome of attempt including new identity object
+ * @returns Success or Failure Message Response including new identity object
  */
 async function addNewKeyPair(identity: Static<typeof Identity>, kid: string, keyName = ''): Promise<IdentityResponse> {
     // get key name from kid if empty or fallback to publish
@@ -730,20 +729,20 @@ async function addNewKeyPair(identity: Static<typeof Identity>, kid: string, key
         }
 
         return { success: true, message: `Added new keys name ${keyName} to identity.`, identity: addResp.identity }
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
 }
 
 /**
- * Add a pre-existing KeyPair to a provided identity.
+ * Add a preexisting KeyPair to a provided identity.
  * This does NOT save the new identity anywhere.
  *
  * @param identity obj containing identity to use
  * @param keyPair KeyPair object containing keys to add
  * @param allowDuplicate don't fail if provided KeyPair is already present in DID
- * @returns outcome of attempt including new identity object
+ * @returns Success or Failure Message Response including new identity object
  */
 async function addExistingKeyPair(identity: Static<typeof Identity>, keyPair: Static<typeof KeyPair>, allowDuplicate = false): Promise<IdentityResponse> {
     try {
@@ -825,15 +824,15 @@ async function addExistingKeyPair(identity: Static<typeof Identity>, keyPair: St
         })
 
         return { success: true, message: `Added existing keys named ${keyName} to identity.`, identity: newId }
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
 }
 
 /**
- * Retrieve and arbitrary amount of keys.
- * This requires you to know and specify the exact paths they
+ * Retrieve an arbitrary amount of keys.
+ * This requires specific knowledge with regards to the exact paths these keys
  * are located at.
  *
  * @param keyFiles array of paths to local key pairs
@@ -908,7 +907,7 @@ async function retrieveKeys(keyFiles: KeyFile[]): Promise<Static<typeof KeyPair>
             }
 
             pairs.push(pair);
-        } catch (error) {
+        } catch (error: any) {
             const msg = handleRuntypeFail(error);
             console.log(msg)
             return false;
@@ -920,7 +919,7 @@ async function retrieveKeys(keyFiles: KeyFile[]): Promise<Static<typeof KeyPair>
 
 /**
  * Create an arbitrary amount of key pairs for a DID.
- * NOTE: this will not add the public keys to the appropriate
+ * NOTE: This will not add the public keys to the appropriate
  * section of the DID.
  *
  * @param did string identifying a DID
@@ -942,8 +941,8 @@ async function generateKeys(did: string, names: string[]): Promise<Static<typeof
         });
 
         // get JWK representation of keys
-        const publicJWK = await fromKeyLike(publicKey);
-        const privateJWK = await fromKeyLike(privateKey);
+        const publicJWK = await exportJWK(publicKey);
+        const privateJWK = await exportJWK(privateKey);
 
         // add alg since it is required
         publicJWK.alg = alg;
@@ -960,7 +959,7 @@ async function generateKeys(did: string, names: string[]): Promise<Static<typeof
                 public: PublicKey.check(publicJWK),
                 private: PrivateKey.check(privateJWK),
             })
-        } catch (error) {
+        } catch (error: any) {
             const msg = handleRuntypeFail(error);
             console.log(msg)
             return false;
@@ -971,13 +970,13 @@ async function generateKeys(did: string, names: string[]): Promise<Static<typeof
 }
 
 /**
- * Create a DIDPSQR doc using specified did string,
- * key pairs, and public info.
+ * Create a DID PSQR doc using specified did string,
+ * key pairs, and public information.
  *
  * @param did string identifying a DID
  * @param keyPairs key pairs to be included in DID
  * @param info public info obj to be included in DID
- * @returns outcome of request including full DID that was generated
+ * @returns Success or Failure Message Response including full DID that was generated
  */
 function generateDID(did: string, keyPairs: Static<typeof KeyPair>[], info: Static<typeof PublicInfo>): DidResponse {
     try {
@@ -1044,7 +1043,7 @@ function generateDID(did: string, keyPairs: Static<typeof KeyPair>[], info: Stat
             success: true,
             didDoc,
         }
-    } catch (error) {
+    } catch (error: any) {
         return { success: false, error }
     }
 }
@@ -1063,26 +1062,30 @@ function generateInfoHash(info: object): string {
 }
 
 /**
- * Parse and return bare did and key name from kid.
+ * Parse and return bare DID and key name from KID.
  *
- * @param kid did with trailing key name
- * @returns bare did and key name or false on error
+ * @param kid DID with trailing key name
+ * @returns bare DID and key name or false on error
  */
 function parseKid(kid: string): { bdid: string; kname: string } | false {
-    const bdid = parseBareDid(kid);
-    if (bdid === false) return false;
+    const parsed = parseDid(kid);
+    if (parsed === null) return false;
 
-    const kname = parseKidKey(kid);
-    if (kname === false) return false;
+    // get bdid and kname
+    const bdid = 'did:' + parsed.method + ':' + parsed.id + (parsed.path || '');
+    const kname = parsed.fragment;
+
+    // validate
+    if (typeof kname === 'undefined') return false;
 
     return { bdid, kname }
 }
 
 /**
- * Get the paths to the DID and keys associated with a kid.
+ * Get the paths to the DID and keys associated with a KID.
  *
  * @param kid did with trailing key name
- * @returns outcome of request including list of paths
+ * @returns Success or Failure Message Response including list of paths
  */
 function parseIdentityPaths(kid: string): PathResponse {
     // return empty on failure
@@ -1139,50 +1142,41 @@ function parseIdentityPaths(kid: string): PathResponse {
 }
 
 /**
- * Remove any key names and return the bare did string.
+ * Remove any key names and return the bare DID string.
  *
- * @param kid did with trailing key name
- * @returns bare did or false on error
+ * @param kid DID with trailing key name
+ * @returns bare DID or false on error
  */
 function parseBareDid(kid: string): string | false {
-    // strip # and anything after
-    try {
-        const bdid = kid.match(/[^#]+/g);
-        if (bdid === null || bdid[0] === null) return false;
+    const parsed = parseDid(kid);
+    if (parsed === null) return false;
 
-        const did = bdid[0];
-        if (typeof did === 'undefined') return false;
+    // get bdid
+    const bdid = 'did:' + parsed.method + ':' + parsed.id + (parsed.path || '');
 
-        return did
-    } catch (error) {
-        return false;
-    }
+    return bdid;
 }
 
 /**
- * Extract key name from kid.
+ * Extract key name from KID.
  *
- * @param kid did with trailing key name
+ * @param kid DID with trailing key name
  * @returns key name or false on error
  */
 function parseKidKey(kid: string): string | false {
-    try {
-        const parts = kid.match(/[^#]+/g);
-        if (parts === null || parts[1] === null) return false;
+    const parsed = parseDid(kid);
+    if (parsed === null) return false;
 
-        // return key name after #
-        const name = parts[1];
-        if (typeof name === 'undefined') return false
+    // get key name
+    const kname = parsed.fragment;
+    if (typeof kname === 'undefined') return false;
 
-        return name
-    } catch (error) {
-        return false;
-    }
+    return kname;
 }
 
 /**
  * Assemble http url where a DID can be found based
- * on provided did string.
+ * on provided did parameter string.
  *
  * @param did string identifying a DID
  * @returns url where DID is located or false on error
@@ -1219,7 +1213,7 @@ function parseDidUrl(did: string): Static<typeof Url> | false {
         const url = Url.check(`https://${path}`);
 
         return url;
-    } catch (error) {
+    } catch (error: any) {
         return false;
     }
 }
@@ -1231,24 +1225,15 @@ function parseDidUrl(did: string): Static<typeof Url> | false {
  * @returns identified type as string
  */
 function parseDidType(did: string): string | false {
-    // remove any key names
-    const bdid = parseBareDid(did);
-    if (bdid === false) return false;
+    const parsed = parseDid(did);
+    if (parsed === null) return false;
 
-    try {
-        const didReg = /did:(\w+)/
-        const result = didReg.exec(bdid)
-        if (result === null) return false;
-
-        return result[1];
-    } catch (error) {
-        return false;
-    }
+    return parsed.method;
 }
 
 /**
- * Verify if the DID specified has an admin key associated with it.
- * Fail if no identity.json file is found or if no admin privileges are returned
+ * Verify if the specified DID has an admin key associated with it.
+ * Return failure if no identity.json file is found or if no admin privileges are returned.
  *
  * @param did did string
  * @returns identity object or error message
@@ -1284,8 +1269,83 @@ async function verifyAdminIdentity(did: string): Promise<IdentityResponse> {
     return idResp;
 }
 
+/**
+ * Get the appropriate url to update the specified DID with.
+ * If not api is found for the root domain of the did, this will
+ * fall back to the did doc path.
+ *
+ * @param did did string
+ * @returns url to update did with, or false on error
+ */
+async function getIdentityUpdateUrl(did: Static<typeof DID>): Promise<Static<typeof Url> | false> {
+    // get root domain from did
+    const parsed = parseDid(did);
+    if (parsed === null) return false;
+    const rootDomain = parsed.id;
+
+    // get all netConfigs in order to find api url if present
+    const nResp = await getNetworkConfig(true);
+    if (nResp.success === false) return false;
+    const netConfigs: Static<typeof NetworkConfig>[] = nResp.data;
+
+    // loop through configs and check if rootDomain is in identityDomains
+    for (let i = 0; i < netConfigs.length; i++) {
+        const config = netConfigs[i];
+
+        if (config.identityDomains.indexOf(rootDomain) !== -1) {
+            return `${config.services.api.url}/identity/${did}`;
+        }
+    }
+
+    // if no api url found, fall back to did doc path
+    return parseDidUrl(did);
+}
+
+/**
+ * Create an Axios Client to work hand in hand with the Identity Propogation and Deletion Commands.
+ *
+ * @param did did string
+ * @param method delete or put method for axios client
+ * @param signature jws of identity.json for identity creation/deletion
+ * @returns success or failure message object from api endpoint
+ */
+async function createIdentityAxiosClient(did: Static<typeof DID>, method: string, signature: string): Promise<DataResponse> {
+    let url = await getIdentityUpdateUrl(did);
+    if (url === false) {
+        return {
+            success: false,
+            message: 'Unable to get url to update Identity with'
+        }
+    }
+
+    const axConfig = {
+        method: method,
+        url: url,
+        data: {
+            token: signature,
+        },
+    };
+
+    const axResp = {
+        success: true,
+        message: 'Successfully sent identity request',
+        data: {},
+    };
+
+    try {
+        const res = await axios(axConfig);
+
+        axResp.data = res.data;
+    } catch (error: any) {
+        const msg = handleRuntypeFail(error);
+        return { success: false, message: msg }
+    }
+
+    return axResp;
+}
+
 export {
     getDid, getKeyPair, addNewKeyPair, addExistingKeyPair, retrieveKeys, generateKeys,
     validateIdentity, addIdentity, createIdentity, getIdentity, getDefaultIds, setDefaultIdentity, getFullIdentity,
-    refreshDid, generateInfoHash, parseDidUrl, parseBareDid, parseKidKey, parseDidType, verifyAdminIdentity,
+    refreshDid, generateInfoHash, parseDidUrl, parseBareDid, parseKidKey, parseDidType, verifyAdminIdentity, createIdentityAxiosClient
 };

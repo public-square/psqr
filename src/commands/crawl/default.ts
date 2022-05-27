@@ -5,6 +5,9 @@ import { crawlTypes, CrawlType, setDefaultCrawl } from '../../functions/crawl';
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Sets the default crawl(s).
+ */
 export default class CrawlDefault extends Command {
     static description = `Set the default Crawl(s)
 Default behavior is to add specified Crawl(s) to defaults.

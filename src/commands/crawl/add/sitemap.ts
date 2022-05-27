@@ -8,6 +8,9 @@ import { Sitemap } from '../../../types/crawl';
 
 const ora = require('ora');
 
+/**
+ * Creates or Updates a Sitemap Crawl Configuration.
+ */
 export default class CrawlAddSitemap extends Command {
     static description = 'Create or update a Sitemap crawl config'
 
@@ -43,7 +46,7 @@ export default class CrawlAddSitemap extends Command {
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.kid === null || args.url === null) {
+        if (typeof args.kid === 'undefined' || typeof args.url === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided')
             return runCommand(['crawl:add:sitemap', '-h']);

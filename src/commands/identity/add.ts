@@ -8,8 +8,11 @@ import { Identity, KeyPair } from '../../types/identity';
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Adds a preexisting identity to the CLI Configuration and creates a new Key.
+ */
 export default class IdentityAdd extends Command {
-    static description = `Add a pre-existing identity to the cli config and create a new key.
+    static description = `Add a preexisting identity to the cli config and create a new key.
 This assumes the DID is located at the url specified in the KID url string.
 If you have some pre-existing keys that you want to add you can either specify the path to them with --path,
 or pass the entire KeyPair as a JSON string with --stdin.
@@ -34,7 +37,7 @@ or pass the entire KeyPair as a JSON string with --stdin.
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.kid === null) {
+        if (typeof args.kid === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['identity:add', '-h']);
@@ -85,10 +88,11 @@ or pass the entire KeyPair as a JSON string with --stdin.
                 if (kfResp.success === false) return oraRun.fail('Unable to find keys at ' + flags.path)
 
                 // separate out key files
-                let privKey, pubKey;
+                let privKey;
+                let pubKey;
                 for (let i = 0; i < kfResp.files.length; i++) {
                     const f = kfResp.files[i];
-                    
+
                     if (typeof f === 'string' || typeof f.data !== 'string') continue;
                     if (f.path.includes(privPath)) {
                         privKey = f.data;

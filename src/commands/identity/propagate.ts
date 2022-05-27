@@ -1,14 +1,15 @@
 import { Command, flags, run as runCommand } from '@oclif/command'
-import { parseJwk } from 'jose/jwk/parse';
-import { CompactSign } from 'jose/jws/compact/sign';
+import { importJWK, CompactSign } from 'jose';
 
-import { parseDidUrl, verifyAdminIdentity } from '../../functions/identity';
-import { createIdentityAxiosClient } from '../../functions/utility';
+import { parseDidUrl, verifyAdminIdentity, createIdentityAxiosClient } from '../../functions/identity';
 
 const ora = require('ora');
 
 const encoder = new TextEncoder();
 
+/**
+ * Propagates an Identity to a Public Square Network that hosts them.
+ */
 export default class IdentityPropagate extends Command {
     static description = `Propagate an Identity to a Public Square Network that hosts Identities.
 It will use any available admin key associated with the identity or it will throw an error if none are available.
@@ -50,7 +51,7 @@ It will use any available admin key associated with the identity or it will thro
 
         // there should only be 1 key pair included that has admin
         const keyPair = idResp.identity.keyPairs[0];
-        const key = await parseJwk(keyPair.private);
+        const key = await importJWK(keyPair.private);
 
         const signature = await new CompactSign(encoder.encode(JSON.stringify(idResp.identity.didDoc)))
             .setProtectedHeader({

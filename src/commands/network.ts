@@ -8,6 +8,10 @@ import { NetworkConfig } from '../types/network';
 
 const ora = require('ora');
 
+/**
+ * Lists out the Network configuration.
+ * Lists Network Config(s) as specified by flags; otherwise, lists out the defaults.
+ */
 export default class Network extends Command {
     static description = `List Network config
 Lists the config of the Network(s) as specified by flags.

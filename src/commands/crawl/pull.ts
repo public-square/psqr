@@ -11,6 +11,9 @@ import { Post } from '../../types/post';
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Crawls new Posts from feeds.
+ */
 export default class CrawlPull extends Command {
     static description = `Crawl new Posts from feeds.
 Don't specify any arguments in order to use the defaults.

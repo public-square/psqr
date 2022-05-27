@@ -12,13 +12,13 @@ export interface ESConfig extends IndexConfig {
 }
 
 /**
- * Search all Indexers for specified string.
- * If no Indexers are specified the default Indexers
+ * Search ElasticSearch Indices for specified string.
+ * If no Indexers are specified, the default Indexers
  * will be used.
  *
  * @param query string to search for
  * @param config configuration for ES to be searched
- * @returns outcome of search
+ * @returns search results
  */
 async function searchES(query: string, config: ESConfig): Promise<ListResponse> {
     // get array of indexers to send post to
@@ -70,7 +70,7 @@ async function searchES(query: string, config: ESConfig): Promise<ListResponse> 
 
             // include all searches
             searches.push(query)
-        } catch (error) {
+        } catch (error: any) {
             const msg = handleRuntypeFail(error);
             const resp = {
                 success: false,

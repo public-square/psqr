@@ -4,16 +4,12 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, append
 import { DataResponse, ProxyConfig } from '../types/interfaces'
 import { Url } from '../types/base-types'
 
-import { getNetworkConfig } from './network';
-import { getVars } from './env';
-import { Static } from 'runtypes';
-import { NetworkConfig } from '../types/network';
-
 const parseDuration = require('parse-duration');
 const axios = require('axios').default;
 const proxyAgent = require('https-proxy-agent');
 const https = require('https');
 
+/** File Configuration */
 export interface FileConfig {
     path: string;
     relative: boolean;
@@ -25,12 +21,12 @@ export interface FileResponse extends DataResponse {
 }
 
 /**
- * Asynchronously create files at paths specified with data specified
- * response is returned once all files have been created or on error.
+ * Asynchronously create files at their specified paths.
+ * Response data is returned once all files have been created, or if there is an error.
  *
  * @param files list of files (path and data) to be created
  * @param lgr logger function to log activity
- * @returns outcome of the file creation and list of created files
+ * @returns Success or Failure Message and Files
  */
 async function createFiles(files: FileConfig[], lgr: Function = () => { /* no log */ }): Promise<FileResponse> {
     const newFiles = [];
@@ -65,10 +61,10 @@ async function createFiles(files: FileConfig[], lgr: Function = () => { /* no lo
 }
 
 /**
- * Append a timestamped line to a log file.
+ * Append a timestamp to a log file as a newline.
  *
  * @param file log file path and string to append
- * @returns outcome of append attempt
+ * @returns Success or Failure Message
  */
 function appendLogFile(file: FileConfig): DataResponse {
     const path = file.relative ? process.cwd() + '/' + file.path : file.path;
@@ -76,7 +72,7 @@ function appendLogFile(file: FileConfig): DataResponse {
 
     try {
         appendFileSync(path, data);
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -85,15 +81,15 @@ function appendLogFile(file: FileConfig): DataResponse {
 }
 
 /**
- * Generate a function that will log a passed string to same file every time.
- * Empty strings will log a divider by default.
+ * Generate a logger to pass a string to a file.
+ * Empty strings will return as a line divider.
  *
  * @param path absolute path to log file
  * @returns logger function
  */
 function generateLogger(path: string): Function {
     return (data: any, divider = false) => {
-        console.log(data);
+        //console.log(data);
         if (data === undefined) return;
         // add divider before if true
         if (divider) {
@@ -111,12 +107,12 @@ function generateLogger(path: string): Function {
 }
 
 /**
- * Asynchronously delete files at paths specified
- * response is returned once all files have been deleted or on error
+ * Asynchronously delete files at their specified paths.
+ * Response data is returned once all files have been deleted, or if there is an error.
  *
  * @param files list of files (path) to be deleted
  * @param lgr logger function to log activity
- * @returns outcome of the file deletion and list of deleted files
+ * @returns Success or Failure Message and list of deleted files
  */
 async function deleteFiles(files: FileConfig[], lgr: Function = () => { /* no log */ }): Promise<FileResponse> {
     const removedFiles = [];
@@ -153,14 +149,14 @@ async function deleteFiles(files: FileConfig[], lgr: Function = () => { /* no lo
 
 /**
  * Asynchronously delete all files in a specified directory
- * that match the specified regular expression.
+ * that match a specified regular expression.
  * This uses regex.test() to determine if it should be deleted.
  * This does not search for files recursively.
  *
  * @param regex regular expression matching files you want deleted
  * @param dir root directory that the files are all in
  * @param lgr logger function to log activity
- * @returns outcome of request and all file deleted
+ * @returns outcome of request and all files deleted
  */
 async function deleteRegFiles(regex: RegExp, dir: FileConfig, lgr: Function = () => { /* no log */ }): Promise<FileResponse> {
     let selected: string[];
@@ -173,7 +169,7 @@ async function deleteRegFiles(regex: RegExp, dir: FileConfig, lgr: Function = ()
 
         // filter out those that don't match the regex
         selected = available.filter(f => regex.test(f));
-    } catch (error) {
+    } catch (error: any) {
         lgr('Unable to delete files because: ' + error.message)
         return {
             success: false,
@@ -197,11 +193,11 @@ async function deleteRegFiles(regex: RegExp, dir: FileConfig, lgr: Function = ()
 }
 
 /**
- * Asynchronously retrieve content of files at paths specified
- * response is returned once all files have been retrieved or on error
+ * Asynchronously retrieve content of files at their specified paths.
+ * Response data is returned once all files have been retrieved, or if there is an error.
  *
  * @param files list of files (path) to get the contents of
- * @returns outcome of request and all file data
+ * @returns Success or Failure Message and all file data
  */
 async function retrieveFiles(files: FileConfig[]): Promise<FileResponse> {
     const fileData = [];
@@ -236,7 +232,7 @@ async function retrieveFiles(files: FileConfig[]): Promise<FileResponse> {
 
 /**
  * Asynchronously retrieve all files in a specified directory
- * that match the specified regular expression.
+ * that match a specified regular expression.
  * This uses regex.test() to determine if it should be included.
  * This does not search for files recursively.
  *
@@ -255,7 +251,7 @@ async function retrieveRegFiles(regex: RegExp, dir: FileConfig): Promise<FileRes
 
         // filter out those that don't match the regex
         selected = available.filter(f => regex.test(f));
-    } catch (error) {
+    } catch (error: any) {
         return {
             success: false,
             message: error.message,
@@ -278,9 +274,8 @@ async function retrieveRegFiles(regex: RegExp, dir: FileConfig): Promise<FileRes
 }
 
 /**
- * Evaluates error and if it is a runtype failure
- * it returns a human readable message.
- * Set PSQR_ENV to debug to get stack trace.
+ * Handles RunType Failures and returns a human readable message.
+ * If PSQR_ENV is set to debug, this will output a stack trace.
  *
  * @param error error object to manage
  * @returns proper error message to use
@@ -290,6 +285,7 @@ function handleRuntypeFail(error: Error | any): string {
 
     // include stack trace if set
     if (process.env.PSQR_ENV === 'debug') {
+        console.error(error);
         msg = error.stack + '\n' + msg;
     }
 
@@ -307,11 +303,11 @@ function handleRuntypeFail(error: Error | any): string {
 }
 
 /**
- * Get a Promise object to delete a specified file
+ * Generate a Promise to delete files.
  *
  * @param file absolute path to file
  * @param lgr logger function to log activity
- * @returns Promise obj for deleting specified file
+ * @returns Promise object for deleting the specified file
  */
 function deleteFilePromise(file: string, lgr: Function = () => { /* no log */ }): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -322,7 +318,7 @@ function deleteFilePromise(file: string, lgr: Function = () => { /* no log */ })
             lgr('Successfully deleted file ' + file);
 
             resolve(file)
-        } catch (error) {
+        } catch (error: any) {
             // log error
             lgr(`Unable to delete file ${file} due to error: ${error.message}`);
             reject(error)
@@ -331,12 +327,12 @@ function deleteFilePromise(file: string, lgr: Function = () => { /* no log */ })
 }
 
 /**
- * Get a Promise object to create a specified file with specified data
+ * Generate a promise to create a specified file with data
  *
  * @param file absolute path to new file
  * @param data content of new file
  * @param lgr logger function to log activity
- * @returns Promise obj for creating specified file
+ * @returns Promise object for creating the file
  */
 function createFilePromise(file: string, data: string, lgr: Function = () => { /* no log */ }): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -350,7 +346,7 @@ function createFilePromise(file: string, data: string, lgr: Function = () => { /
             lgr('Successfully created file ' + file);
 
             resolve(file)
-        } catch (error) {
+        } catch (error: any) {
             // log error
             lgr(`Unable to create file ${file} due to error: ${error.message}`);
             reject(error)
@@ -359,10 +355,10 @@ function createFilePromise(file: string, data: string, lgr: Function = () => { /
 }
 
 /**
- * Get a Promise object to retrieve that content of a specified file
+ * Generate a promise to retrieve content of a specified file
  *
  * @param path absolute path to file
- * @returns Promise obj for retrieving specified file
+ * @returns Promise object for retrieving the file
  */
 function getFilePromise(path: string): Promise<FileConfig> {
     return new Promise((resolve, reject) => {
@@ -375,15 +371,15 @@ function getFilePromise(path: string): Promise<FileConfig> {
             }
 
             resolve(resp)
-        } catch (error) {
+        } catch (error: any) {
             reject(error)
         }
     })
 }
 
 /**
- * Run a promise function concurrently on an array of data
- * while limiting how many can run at the same time.
+ * Run all concurrent promises on an array of data.
+ * Set a limit to determine how many can run at the same time.
  *
  * @param args array of arrays containing params for each run
  * @param func function to run concurrently that returns a promise
@@ -407,7 +403,7 @@ async function concurrentPromises(args: any[][], func: (...args: any[]) => Promi
                     try {
                         const resp = await func(...params);
                         results.push(resp);
-                    } catch (error) {
+                    } catch (error: any) {
                         failed.push(error.message);
                     }
                 }
@@ -436,7 +432,7 @@ async function concurrentPromises(args: any[][], func: (...args: any[]) => Promi
 }
 
 /**
- * Follow a url that redirects to its final destination.
+ * Get the redirect url to determine a final destination of a url string.
  * If a proxyConfig is specified and the first attempt times out
  * a second attempt will be made using the proxy.
  *
@@ -468,7 +464,7 @@ async function getRedirectUrl(url: string, proxyConfig: ProxyConfig = false, for
             message: 'Successfully found the redirect url',
             data: resp.request.res.responseUrl,
         }
-    } catch (error) {
+    } catch (error: any) {
         if (error.code === 'ECONNABORTED' && proxyConfig !== false && forceProxy === false) {
             const redirectUrl = await getRedirectUrl(url, proxyConfig, true);
             return redirectUrl;
@@ -476,48 +472,6 @@ async function getRedirectUrl(url: string, proxyConfig: ProxyConfig = false, for
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
-}
-
-/**
- * Create an Axios Client to work hand in hand with the Identity Propogation and Deletion Commands.
- *
- * @param did did string
- * @param method delete or put method for axios client
- * @param signature jws of identity.json for identity creation/deletion
- * @returns success or failure message object from api endpoint
- */
-async function createIdentityAxiosClient(did: string, method: string, signature: string): Promise<DataResponse> {
-    const env = getVars();
-
-    const nResp = await getNetworkConfig();
-    const netConfig: Static<typeof NetworkConfig> = nResp.data[0];
-
-    const url = `${netConfig.services.api.url}/identity/${did}`;
-
-    const axConfig = {
-        method: method,
-        url: url,
-        data: {
-            token: signature,
-        },
-    };
-
-    const axResp = {
-        success: true,
-        message: 'Successfully sent identity request',
-        data: {},
-    };
-
-    try {
-        const res = await axios(axConfig);
-
-        axResp.data = res.data;
-    } catch (error) {
-        const msg = handleRuntypeFail(error);
-        return { success: false, message: msg }
-    }
-
-    return axResp;
 }
 
 function convertSinceToTimestamp(since = ''): number {
@@ -530,4 +484,4 @@ function convertSinceToTimestamp(since = ''): number {
     return ts;
 }
 
-export { createFiles, deleteFiles, deleteRegFiles, retrieveFiles, retrieveRegFiles, handleRuntypeFail, appendLogFile, generateLogger, concurrentPromises, getRedirectUrl, convertSinceToTimestamp, createIdentityAxiosClient }
+export { createFiles, deleteFiles, deleteRegFiles, retrieveFiles, retrieveRegFiles, handleRuntypeFail, appendLogFile, generateLogger, concurrentPromises, getRedirectUrl, convertSinceToTimestamp }

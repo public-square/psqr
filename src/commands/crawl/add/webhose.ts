@@ -7,6 +7,9 @@ import { Webhose } from '../../../types/crawl';
 
 const ora = require('ora');
 
+/**
+ * Creates a new Webhose Crawl Configuration.
+ */
 export default class CrawlAddWebhose extends Command {
     static description = 'Create a new Webhose Crawl config'
 
@@ -35,7 +38,7 @@ export default class CrawlAddWebhose extends Command {
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.kid === null || args.username === null) {
+        if (typeof args.kid === 'undefined' || typeof args.username === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided')
             return runCommand(['crawl:add:webhose', '-h']);

@@ -5,6 +5,11 @@ import { log, generateLogInput } from '../functions/log'
 
 const ora = require('ora');
 
+/**
+ * View or set psqr environment variables.
+ * If a valid env [FILE] is specified, this will replace the
+ * current env and be saved.
+ */
 export default class Env extends Command {
     static description = 'View or set psqr environment vars. If a valid env [FILE] is specified it will replace the current env and be saved.'
 

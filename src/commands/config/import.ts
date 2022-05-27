@@ -8,6 +8,9 @@ import { PsqrConfig } from '../../types/config';
 
 const ora = require('ora');
 
+/**
+ * Imports a Configuration and sets it as default if specified.
+ */
 export default class ConfigImport extends Command {
     static description = 'Import a config and set as default if specified'
 
@@ -50,7 +53,7 @@ export default class ConfigImport extends Command {
         try {
             const rfile = fileResp.files[0];
             if (typeof rfile === 'string' || typeof rfile.data !== 'string') {
-                return oraImport.fail(`Unable to import config because retrieved config data was invalid`)
+                return oraImport.fail('Unable to import config because retrieved config data was invalid')
             }
             const config: Static<typeof PsqrConfig> = JSON.parse(rfile.data);
 

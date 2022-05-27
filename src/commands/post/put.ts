@@ -8,6 +8,9 @@ import { retrieveFiles } from '../../functions/utility';
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Publishes content to the specified Broadcaster.
+ */
 export default class PostPut extends Command {
     static description = 'Publish content to the specified Broadcaster'
 
@@ -36,7 +39,7 @@ export default class PostPut extends Command {
 
         if (flags.stdin === true) args.data = await getStdin();
 
-        if (args.hash === null || args.data === null) {
+        if (typeof args.hash === 'undefined' || typeof args.data === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['post:put', '-h']);

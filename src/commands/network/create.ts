@@ -7,6 +7,9 @@ import { NetworkConfig } from '../../types/network';
 
 const ora = require('ora');
 
+/**
+ * Creates a new Network's configuration.
+ */
 export default class NetworkCreate extends Command {
     static description = 'Create a new Network config'
 
@@ -18,6 +21,7 @@ export default class NetworkCreate extends Command {
         link: flags.string({char: 'i', description: 'Url to use instead of link default (link.[domain])'}),
         beacon: flags.string({char: 'b', description: 'Url to use instead of beacon default (beacon.[domain])'}),
         api: flags.string({char: 'a', description: 'Url to use instead of api default ([domain]/api)'}),
+        identityDomains: flags.string({char: 'd', description: 'Comma separated list of identityDomains to use instead of the default (did:psqr:[domain])'}),
     }
 
     static args = [
@@ -36,7 +40,7 @@ export default class NetworkCreate extends Command {
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.domain === null || args.name === null) {
+        if (typeof args.domain === 'undefined' || typeof args.name === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided')
             return runCommand(['network:create', '-h']);
@@ -48,33 +52,40 @@ export default class NetworkCreate extends Command {
         oraStart.succeed('Command ready')
         const oraCreate = ora('Create New Network...').start();
 
+        // determine identityDomains
+        let identityDomains = [`did:psqr:${domain}`];
+        if (typeof flags.identityDomains !== 'undefined') {
+            identityDomains = flags.identityDomains.replace(/\s/g, '').split(',');
+        }
+
         let config: Static<typeof NetworkConfig>;
         try {
             config = NetworkConfig.check({
                 name: name,
                 domain: domain,
+                identityDomains: identityDomains,
                 content: {
-                    search:  {
-                        url: flags.search || `https://search.${domain}`
+                    search: {
+                        url: flags.search || `https://search.${domain}`,
                     },
-                    list:   {
-                        url: flags.list || `https://list.${domain}`
+                    list: {
+                        url: flags.list || `https://list.${domain}`,
                     },
-                    feed:   {
-                        url: flags.feed || `https://feed.${domain}`
+                    feed: {
+                        url: flags.feed || `https://feed.${domain}`,
                     },
-                    link:   {
-                        url: flags.link || `https://link.${domain}`
+                    link: {
+                        url: flags.link || `https://link.${domain}`,
                     },
-                    beacon:   {
-                        url: flags.beacon || `https://beacon.${domain}`
-                    }
+                    beacon: {
+                        url: flags.beacon || `https://beacon.${domain}`,
+                    },
                 },
                 services: {
-                    api:   {
+                    api: {
                         url: flags.api || `https://${domain}/api`,
-                    }
-                }
+                    },
+                },
             })
         } catch (error) {
             const msg = handleRuntypeFail(error);

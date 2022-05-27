@@ -4,6 +4,9 @@ import { createFiles, FileConfig } from '../../functions/utility';
 
 const ora = require('ora');
 
+/**
+ * Exports the full configuration for a specified DID.
+ */
 export default class ConfigExport extends Command {
     static description = 'Export the full configuration for a specified DID'
 

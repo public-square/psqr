@@ -9,6 +9,9 @@ import { parseBareDid } from '../../functions/identity';
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Runs a test crawl to verify if the information gathered is accurate.
+ */
 export default class CrawlTest extends Command {
     static description = `Run a test Crawl to verify the information gathered is accurate.
 Output normally includes post.info.publicSquare.package only as json array.
@@ -146,7 +149,7 @@ Output is saved as a local file(s) with the name crawl-test-{ level }-{ path val
 
             // assemble path
             const bdid = parseBareDid(configData.config.kid);
-            const validDid = bdid === false ? configData.config.kid.replace(/[:\/]/g, '-') : bdid.replace(/[:\/]/g, '-');
+            const validDid = bdid === false ? configData.config.kid.replace(/[:/]/g, '-') : bdid.replace(/[:/]/g, '-');
             const extension = flags.list ? 'jsonl' : 'json';
             const path = `crawl-test-${testLevel}-${validDid}-${Date.now()}.${extension}`;
 

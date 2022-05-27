@@ -25,7 +25,7 @@ const POSSIBLE_VARS = [
     'HISTORY_LIMIT',
 ];
 
-interface EnvVars {
+export interface EnvVars {
     DEFAULT_DID?: string;
     DEFAULT_KEY?: string;
     DEFAULT_LANGUAGE?: string;
@@ -49,7 +49,7 @@ interface EnvVars {
  * Check for the existance of the env file.
  * Try to create it if it doesn't exist.
  *
- * @returns does the env file currently exist?
+ * @returns boolean verification of existence
  */
 function checkForEnv(): boolean {
     try {
@@ -59,14 +59,14 @@ function checkForEnv(): boolean {
         }
 
         return true
-    } catch (error) {
+    } catch (error: any) {
         console.error(error)
         return false
     }
 }
 
 /**
- * Set ENV vars to values specified.
+ * Set environment variables as specified.
  * This will completely override the ENV vars and
  * there are no checks in place for the validity
  * of the new values specified.
@@ -121,7 +121,7 @@ function setVars(vars: string, file = false): EnvVars {
 }
 
 /**
- * Get the values of specified ENV vars.
+ * Get the values of desired ENV vars.
  * You can specify a comma separated list or an array.
  * Defaults to retrieving values of all possible vars.
  *

@@ -1,6 +1,7 @@
 import {Record, Number, String, Literal} from 'runtypes';
 import {CrawlFilters, KID, Url, ValueFilters} from './base-types';
 
+/** Base Crawler */
 const Crawl = Record({
     kid: KID,
     type: String,
@@ -17,12 +18,14 @@ const Crawl = Record({
     }).optional(),
 });
 
+/** RSS Feed Crawler */
 const RSS = Crawl.And(Record({
     type: Literal('rss'),
     url: Url,
     etag: String,
 }));
 
+/** Twitter Post Crawler */
 const Twitter = Crawl.And(Record({
     type: Literal('twitter'),
     username: String,
@@ -30,11 +33,13 @@ const Twitter = Crawl.And(Record({
     lastTweet: String,
 }));
 
+/** Webhose Scrapper Crawler */
 const Webhose = Crawl.And(Record({
     type: Literal('webhose'),
     url: Url,
 }));
 
+/** Sitemap Crawler */
 const Sitemap = Crawl.And(Record({
     type: Literal('sitemap'),
     url: Url,

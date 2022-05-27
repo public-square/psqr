@@ -1,5 +1,4 @@
-import { parseJwk } from 'jose/jwk/parse';
-import { CompactSign } from 'jose/jws/compact/sign';
+import { importJWK, CompactSign } from 'jose';
 
 import { Static } from 'runtypes';
 
@@ -23,7 +22,8 @@ export interface PutConfig extends BroadcastConfig {
     hash: string;
 }
 
-interface JWSData {
+/** JWS Data including Hash */
+export interface JWSData {
     jws: Static<typeof JwsPost>;
     hash: string;
 }
@@ -42,12 +42,11 @@ interface PublishResponse extends AxiosResponse {
 
 /**
  * Create a signed JWS string using specified identity.
- * Content param must be complete JSON string containing
- * all data to be used.
+ * Content param must be a complete JSON string containing data to be used.
  *
  * @param content JSON string to encrypt
  * @param identity obj containing identity to use
- * @returns signed JWS string
+ * @returns Success or Failure Message Response and signed JWS string
  */
 async function createJWS(content: string, identity: Static<typeof Identity>): Promise<JWSResponse> {
     try {
@@ -59,7 +58,7 @@ async function createJWS(content: string, identity: Static<typeof Identity>): Pr
         if (keyPair === null) return { success: false, message: 'No keys available to use' };
 
         // get key from JWK and validate content as Post
-        const key = await parseJwk(keyPair.private);
+        const key = await importJWK(keyPair.private);
         const contentObj = Post.check(JSON.parse(content));
 
         const hash = contentObj.infoHash;
@@ -81,7 +80,7 @@ async function createJWS(content: string, identity: Static<typeof Identity>): Pr
             message: 'Successfully created JWS',
             data: { jws, hash },
         }
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return {
             success: false,
@@ -91,11 +90,11 @@ async function createJWS(content: string, identity: Static<typeof Identity>): Pr
 }
 
 /**
- * Assembles a post object from a PostSkeleton.
+ * Assembles a Post object from a PostSkeleton.
  *
  * @param skeleton post skeleton object
  * @param identity obj containing identity to use
- * @returns Response object with post as data
+ * @returns Success or Failure Message Response with post as data
  */
 async function createPost(skeleton: Static<typeof PostSkeleton>, identity: Static<typeof Identity>): Promise<DataResponse> {
     try {
@@ -114,7 +113,7 @@ async function createPost(skeleton: Static<typeof PostSkeleton>, identity: Stati
 
         // get key, keyId, and DID from identity
         const keyPair = identity.keyPairs[0];
-        const key = await parseJwk(keyPair.private);
+        const key = await importJWK(keyPair.private);
         const keyId = parseKidKey(keyPair.kid);
         if (keyId === false) return { success: false, message: 'Unable to parse key name' };
 
@@ -177,7 +176,7 @@ async function createPost(skeleton: Static<typeof PostSkeleton>, identity: Stati
             message: 'Successfully created Post',
             data: post,
         }
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return {
             success: false,
@@ -187,9 +186,9 @@ async function createPost(skeleton: Static<typeof PostSkeleton>, identity: Stati
 }
 
 /**
- * Create a post object using the web page located at the url.
- * OG data is pulled and used to fill in the post info.
- * Currently no post body is retrieved.
+ * Create a post object using the web page as its url.
+ * OG data is pulled and used to fill in the post information.
+ * Note: currently, no post body is retrieved.
  *
  * @param url url of web page to pull og data from
  * @param identity obj containing identity to use
@@ -255,7 +254,7 @@ async function createUrlPost(url: string, identity: Static<typeof Identity>, fil
         if (filters !== false) {
             skeleton = filterPostValues(skeleton, filters);
         }
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -273,8 +272,7 @@ async function createUrlPost(url: string, identity: Static<typeof Identity>, fil
 }
 
 /**
- * Publish multiple posts asynchronously while limiting
- * the concurrent requests to 100 simultaneously.
+ * Publish multiple posts asynchronously with a limit of 100 concurrent requests.
  *
  * @param postData array of objects containing the hash and the JWS
  * @param config base post config to change the hash of for each post
@@ -319,7 +317,7 @@ async function putMultiplePosts(postData: JWSData[], config: PutConfig, lgr: Fun
 
 /**
  * Publish Post data to specified Broadcaster(s).
- * Data param must be the complete string that is to be
+ * Data parameter must be the complete string that is to be
  * sent to the Broadcaster.
  *
  * @param jwsPost JwsPost obj to be published to broadcaster
@@ -361,7 +359,7 @@ async function putPost(jwsPost: Static<typeof JwsPost>, config: PutConfig, lgr: 
 
         // ensure post data is valid
         JwsPost.check(jwsPost);
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         lgr(failMsg + msg);
         return {
@@ -394,7 +392,7 @@ async function putPost(jwsPost: Static<typeof JwsPost>, config: PutConfig, lgr: 
 
             // include all responses
             responses.push(response)
-        } catch (error) {
+        } catch (error: any) {
             const msg = handleRuntypeFail(error);
             lgr(failMsg + msg);
             return {
@@ -451,7 +449,7 @@ async function putPost(jwsPost: Static<typeof JwsPost>, config: PutConfig, lgr: 
 
 /**
  * Remove any values from a post skeleton that are in the filter list
- * and return the resulting skeleton
+ * and return the resultant skeleton.
  *
  * @param skeleton post skeleton with values to be filtered
  * @param filters object containing the filter lists

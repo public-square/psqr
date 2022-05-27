@@ -7,6 +7,9 @@ const ora = require('ora');
 const homedir = require('os').homedir();
 const IDENTITY_PATH = `${homedir}/.config/psqr/identities`;
 
+/**
+ * Self Hosts an Identity via finding the local file and the URL that must serve it.
+ */
 export default class IdentityResolve extends Command {
     static description = 'For Self Hosting the Identity, find the local file and the URL that must serve it.';
 

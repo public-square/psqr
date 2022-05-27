@@ -1,5 +1,4 @@
 import { Command, flags } from '@oclif/command'
-import { createFiles, FileConfig } from '../functions/utility';
 import { setVars } from '../functions/env';
 import { promptIdentitySetup, promptProxySetup, persistIdentitySetup, persistProxySetup, promptNetworkSetup, persistNetworkSetup, promptCrawlSetup, persistCrawlSetup } from '../functions/setup';
 import { log, generateLogInput } from '../functions/log'
@@ -7,6 +6,11 @@ import { log, generateLogInput } from '../functions/log'
 const ora = require('ora');
 const inquirer = require('inquirer');
 
+/**
+ * Setup your environment.
+ * This utility will prompt you for information to set up your identity,
+ * keys, necessary networking, and any content crawling configuration you may need.
+ */
 export default class Setup extends Command {
     static description = `This utility will prompt you for the all of the necessary info to get your environment up and running.
 It will set up your identity, keys, necessary networking, and any content crawling configuration you may need.
@@ -14,7 +18,7 @@ It will set up your identity, keys, necessary networking, and any content crawli
 
     static flags = {
         help: flags.help({ char: 'h' }),
-        //script: flags.boolean({char: 's',default: false, description: 'Generate a shell and batch script that will replicate the setup you create with this command.'}),
+        // script: flags.boolean({char: 's',default: false, description: 'Generate a shell and batch script that will replicate the setup you create with this command.'}),
     }
 
     async run() {
@@ -74,26 +78,26 @@ It will set up your identity, keys, necessary networking, and any content crawli
         // determine identity setup and then persist
         const oraId = ora();
         const idSetup = await promptIdentitySetup();
-        const idResp = await persistIdentitySetup(idSetup, oraId);
+        const idResp = await persistIdentitySetup(idSetup.data, oraId);
         if (idResp.success === false) {
             oraId.fail('Identity setup cancelled because: ' + idResp.message);
             return false;
         }
-        oraId.succeed(`Identity setup for ${idSetup.did} was successful. Default identity set to ${idResp.identity.keyPairs[0].kid}`);
+        oraId.succeed(`Identity setup for ${idSetup.data.did} was successful. Default identity set to ${idResp.identity.keyPairs[0].kid}`);
 
         /****************************************************************************/
         // CONTENT CREATOR check
         if (userOptions.indexOf(userType.type) <= 0) {
-            const msg = `Your environment is now completely set up for ${idSetup.did}.\n` +
+            const msg = `Your environment is now completely set up for ${idSetup.data.did}.\n` +
                 `If you want to Propagate your Identity you can do so with the command:\n\n` +
-                `psqr identity:propagate ${idSetup.did}`
+                `psqr identity:propagate ${idSetup.data.did}`
             return ora(msg).succeed();
         }
 
         /****************************************************************************/
         // CONTENT CRAWLER check
         if (userOptions.indexOf(userType.type) <= 1) {
-            const msg = `Your environment is now completely set to create content for ${idSetup.did}.\n` +
+            const msg = `Your environment is now completely set to create content for ${idSetup.data.did}.\n` +
                 `You can create, sign, and publish a post with a command like:\n\n` +
                 `psqr post 'Post body' \\
    --raw \\
@@ -137,7 +141,7 @@ It will set up your identity, keys, necessary networking, and any content crawli
         oraCrawl.succeed(`Crawl setup was successful.`);
 
         // end message for content crawler setup
-        const msg = `Your environment is now completely set to crawl content for ${idSetup.did}.\n` +
+        const msg = `Your environment is now completely set to crawl content for ${idSetup.data.did}.\n` +
         `You can crawl, sign, and publish posts from all of the default crawls with the command:\n\n` +
         `psqr crawl\n\n` +
         `Or in separate steps with "psqr crawl:pull" and "psqr crawl:publish".`

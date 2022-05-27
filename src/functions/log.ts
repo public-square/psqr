@@ -1,11 +1,13 @@
 const chalk = require('chalk');
 const util = require('util');
 
-interface CodeObj {
+/** Code Object with Key and Object */
+export interface CodeObj {
     key: string;
     obj: any;
 }
 
+/** Logger Input */
 export interface LogInput {
     title: string;
     cmd: string;
@@ -14,8 +16,8 @@ export interface LogInput {
 }
 
 /**
- * Log information to the CLI in a user-readable and structured format
- * Use this as a standard way to output code, data, responses, etc. to the user
+ * Log information to the CLI in a user-readable and structured format.
+ * Use this as a standard way to output code, data, responses, and other information to the user
  *
  * @param input obj containing all necessary elements for logging
  */
@@ -64,8 +66,8 @@ ${muted(el.key + ':')}`)
 }
 
 /**
- * Generate a LogInput object with the required standard properties
- * Use this to simplify creating a LogInput so you only need to add unique data
+ * Generate a LogInput object with properties referenced by LogInput Interface.
+ * Use this to simplify creation of a LogInput.
  *
  * @param argv command args from process.argv
  * @returns LogInput object with required properties

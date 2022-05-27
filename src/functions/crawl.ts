@@ -22,34 +22,48 @@ const readLastLines = require('read-last-lines');
 const ogs = require('open-graph-scraper');
 
 const BASE_PATH = `${homedir}/.config/psqr/crawl`;
+
+/** Crawler Logger */
 export const crawlLgr = generateLogger(`${BASE_PATH}/log`);
 
+/** Crawler Base Types */
 export type CrawlType = 'rss' | 'twitter' | 'webhose' | 'sitemap';
+
+/** Crawler Types List */
 export const crawlTypes: CrawlType[] = [
     'rss',
     'twitter',
     'webhose',
     'sitemap',
 ]
+
+/** Crawler Variables */
 export enum CrawlVars {
     rss = 'DEFAULT_RSS',
     twitter = 'DEFAULT_TWITTER',
     webhose = 'DEFAULT_WEBHOSE',
     sitemap = 'DEFAULT_SITEMAP'
 }
+
 enum DefaultLimits {
     twitter = 5,
     rss = 5,
     webhose = 5,
     sitemap = 5
 }
+
+/** Crawler Configuration */
 export type CrawlConfig = Static<typeof RSS> | Static<typeof Twitter> | Static<typeof Webhose> | Static<typeof Sitemap>;
+
+/** Crawler Finalized Feed List */
 export interface FeedList {
     rss?: string[];
     twitter?: string[];
     webhose?: string[];
     sitemap?: string[];
 }
+
+/** Sitemap Options */
 export interface SitemapOptions {
     lastmod: number;
     include?: string;
@@ -57,23 +71,23 @@ export interface SitemapOptions {
 }
 
 /**
- * Check if a string is a valid crawl type
+ * Check if a string is a valid crawl type.
  *
  * @param type value to check
- * @returns is this a valid crawl type
+ * @returns boolean result
  */
 function typeCheck(type: CrawlType): boolean {
     return crawlTypes.includes(type);
 }
 
 /**
- * Get the crawl configs of the crawls specified.
- * If dids is skipped or false return current default configs.
- * If dids is true return all available configs.
+ * Get the crawler configurations for the specified crawlers.
+ * If dids parameter is skipped or false, return current default configurations.
+ * If dids is true, return all available configs.
  *
  * @param type lowercase Crawl type config
  * @param dids comma separated list of crawl dids
- * @returns outcome of request including an array of the configs
+ * @returns Success or Failure Message Response including an array of the configs
  */
 async function getCrawlConfig(type: CrawlType, dids: string | boolean = false): Promise<DataResponse> {
     if (!typeCheck(type)) return { success: false, message: 'Invalid Crawl type' }
@@ -134,16 +148,16 @@ async function getCrawlConfig(type: CrawlType, dids: string | boolean = false): 
             message: `Successfully retrieved all ${type} configs`,
             data: configs,
         };
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
 }
 
 /**
- * Gather the configs specified.
- * If no feeds are specified defaults will be used,
- * unless the noDefaults param is true.
+ * Assemble all Crawler Configurations for those specified.
+ * If no feeds are specified, defaults will be used,
+ * unless the noDefaults param is set to True.
  *
  * @param feeds list of feed dids separated by type
  * @param noDefaults don't use defaults if list of dids is empty
@@ -177,13 +191,13 @@ async function assembleCrawlConfigs(feeds: FeedList = {}, noDefaults = false): P
 }
 
 /**
- * Remove specified crawls completely.
- * If a specified crawl is a default it will be remove
+ * Remove specified crawlers completely.
+ * If a specified crawl is a default, it will be removed
  * from the list of defaults.
  *
  * @param type lowercase Crawl type config
  * @param dids comma separated list of crawl dids
- * @returns outcome of request including an array of the files deleted
+ * @returns Success or Failure Message Response including an array of the files deleted
  */
 async function removeCrawl(type: CrawlType, dids: string): Promise<DataResponse> {
     if (!typeCheck(type)) return { success: false, message: 'Invalid Crawl type' }
@@ -232,21 +246,21 @@ async function removeCrawl(type: CrawlType, dids: string): Promise<DataResponse>
         // send request and pass on response
         const resp = await deleteFiles(files);
         return resp;
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
 }
 
 /**
- * Set the defaults for a specified crawl.
- * Unless indicated otherwise by param overwrite,
+ * Set the defaults for a specified crawler.
+ * Unless indicated otherwise,
  * specified dids will be added to current default list.
  *
  * @param type lowercase Crawl type config
  * @param dids comma separated list of crawl dids
  * @param overwrite should the list of dids completely overwrite current defaults
- * @returns outcome of request including the current defaults
+ * @returns Success or Failure Message Response including the current defaults
  */
 function setDefaultCrawl(type: CrawlType, dids: string, overwrite = false): DataResponse {
     if (!typeCheck(type)) return { success: false, message: 'Invalid Crawl type' }
@@ -308,10 +322,10 @@ function setDefaultCrawl(type: CrawlType, dids: string, overwrite = false): Data
 }
 
 /**
- * Get an array of the default dids for a specified crawl
+ * Get an array of the default DIDs for a specified crawler.
  *
  * @param type lowercase Crawl type
- * @returns outcome of request including an array of the default dids
+ * @returns Success or Failure Message Response including an array of the default DIDs
  */
 function getDefaultCrawl(type: CrawlType): DataResponse {
     if (!typeCheck(type)) return { success: false, message: 'Invalid Crawl type' }
@@ -337,14 +351,14 @@ function getDefaultCrawl(type: CrawlType): DataResponse {
 }
 
 /**
- * Get all posts stored with the crawl and sign them.
- * The default is to store the newly signed posts with the originals
+ * Retrieve all posts stored by the crawler and sign them.
+ * Default behavior is to store the newly signed posts with the originals,
  * but that can be overridden with the store param.
  *
  * @param config config of Crawl
  * @param store should the signed posts be stored
  * @param posts array of posts
- * @returns outcome of request including an array of the signed posts and their hashes
+ * @returns Success or Failure Message Response including an array of the signed posts and their hashes
  */
 async function signCrawledPosts(config: CrawlConfig, store = true, posts: Static<typeof Post>[] = []): Promise<DataResponse> {
     const PATH = crawlPath(config.kid);
@@ -441,11 +455,11 @@ async function signCrawledPosts(config: CrawlConfig, store = true, posts: Static
 
 /**
  * Remove all posts (signed or otherwise) from
- * specified crawls completely.
+ * specified crawlers completely.
  *
  * @param did did of crawl to delete posts from
  * @param postHashes list of hashes of posts to remove
- * @returns outcome of request including an array of the files deleted
+ * @returns Success or Failure Message Response including an array of the files deleted
  */
 async function removeCrawledPosts(did: string, postHashes: string[]): Promise<FileResponse> {
     const PATH = crawlPath(did)
@@ -472,12 +486,12 @@ async function removeCrawledPosts(did: string, postHashes: string[]): Promise<Fi
 }
 
 /**
- * Crawl specified feeds and return new post.
+ * Crawl specified feeds and return new posts.
  * @param configs array of crawl configs to use
  * @param store should the posts be stored
  * @param proxyConfig config object for proxy service to use
  * @param testLevel 0-4 indicating what test data should be returned, 0 is normal
- * @returns outcome of request including list of new posts
+ * @returns Success or Failure Message Response including list of new posts
  */
 async function crawlFeeds(configs: CrawlConfig[], store = false, proxyConfig: ProxyConfig = false, testLevel = 0): Promise<ListResponse> {
     const items: DataResponse[] = [];
@@ -652,11 +666,11 @@ async function crawlFeeds(configs: CrawlConfig[], store = false, proxyConfig: Pr
 }
 
 /**
- * Create a RSS config.
- * Can be used to overwrite current config.
+ * Create a RSS configuration.
+ * This configuration can be used to overwrite current config.
  *
  * @param config RSS config
- * @returns outcome of creation attempt
+ * @returns Success or Failure Message Response
  */
 function writeRSSCrawl(config: Static<typeof RSS>): DataResponse {
     const did = parseBareDid(config.kid);
@@ -670,7 +684,7 @@ function writeRSSCrawl(config: Static<typeof RSS>): DataResponse {
         // validate config and then write to file
         RSS.check(config);
         writeFileSync(`${RSS_PATH}/config.rss.json`, JSON.stringify(config))
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -682,11 +696,11 @@ function writeRSSCrawl(config: Static<typeof RSS>): DataResponse {
 }
 
 /**
- * Create a Twitter config.
- * Can be used to overwrite current config.
+ * Create a Twitter configuration.
+ * This configuration can be used to overwrite current config.
  *
  * @param config Twitter config
- * @returns outcome of creation attempt
+ * @returns Success or Failure Message Response
  */
 async function writeTwitterCrawl(config: Static<typeof Twitter>): Promise<DataResponse> {
     const did = parseBareDid(config.kid);
@@ -735,7 +749,7 @@ async function writeTwitterCrawl(config: Static<typeof Twitter>): Promise<DataRe
         }
 
         writeFileSync(`${TWITTER_PATH}/config.twitter.json`, JSON.stringify(config))
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -747,11 +761,11 @@ async function writeTwitterCrawl(config: Static<typeof Twitter>): Promise<DataRe
 }
 
 /**
- * Create a Webhose config.
- * Can be used to overwrite current config.
+ * Create a Webhose configuration.
+ * This configuration can be used to overwrite current config.
  *
  * @param config Webhose config
- * @returns outcome of creation attempt
+ * @returns Success or Failure Message Response
  */
 function writeWebhoseCrawl(config: Static<typeof Webhose>): DataResponse {
     const did = parseBareDid(config.kid);
@@ -765,7 +779,7 @@ function writeWebhoseCrawl(config: Static<typeof Webhose>): DataResponse {
         // validate config and then write to file
         Webhose.check(config);
         writeFileSync(`${WEBHOSE_PATH}/config.webhose.json`, JSON.stringify(config))
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -777,11 +791,11 @@ function writeWebhoseCrawl(config: Static<typeof Webhose>): DataResponse {
 }
 
 /**
- * Create a Sitemap config.
- * Can be used to overwrite current config.
+ * Create a Sitemap configuration.
+ * This configuration can be used to overwrite current config.
  *
  * @param config Sitemap config
- * @returns outcome of creation attempt
+ * @returns Success or Failure Message Response
  */
 function writeSitemapCrawl(config: Static<typeof Sitemap>): DataResponse {
     const did = parseBareDid(config.kid);
@@ -795,7 +809,7 @@ function writeSitemapCrawl(config: Static<typeof Sitemap>): DataResponse {
         // validate config and then write to file
         Sitemap.check(config);
         writeFileSync(`${SITEMAP_PATH}/config.sitemap.json`, JSON.stringify(config))
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -808,14 +822,14 @@ function writeSitemapCrawl(config: Static<typeof Sitemap>): DataResponse {
 
 /**
  * Query a Webhose feed and return an ordered list of posts
- * from the feed items.
+ * from the returned feed items.
  *
  * @param config Webhose crawl config
  * @param identity identity to use when creating posts
  * @param lgr logger function
  * @param proxyConfig config object for proxy service to use
  * @param testLevel 0-4 indicating what test data should be returned, 0 is normal
- * @returns outcome with ordered list of posts
+ * @returns Success or Failure Message Response with ordered list of posts
  */
 async function getWebhosePosts(config: Static<typeof Webhose>, identity: Static<typeof Identity>, lgr: Function = () => { /* no log */ }, proxyConfig: ProxyConfig = false, testLevel = 0): Promise<DataResponse> {
     let url = config.url;
@@ -834,7 +848,7 @@ async function getWebhosePosts(config: Static<typeof Webhose>, identity: Static<
 
     try {
         resp = await axios.get(url, axConfig);
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -904,7 +918,7 @@ async function getWebhosePosts(config: Static<typeof Webhose>, identity: Static<
 
         try {
             ogsData = await ogs(options);
-        } catch (error) {
+        } catch (error: any) {
             const msg = handleRuntypeFail(error);
             console.log(msg);
             continue;
@@ -938,7 +952,7 @@ async function getWebhosePosts(config: Static<typeof Webhose>, identity: Static<
                 image: typeof ogsData.result.ogImage !== 'undefined' && ogsData.result.ogImage ? ogsData.result.ogImage.url : item.thread.main_image || item.thread.main_image > 0 ? item.thread.main_image : '',
                 canonicalUrl: typeof ogsData.result.ogUrl !== 'undefined' && ogsData.result.ogUrl ? ogsData.result.ogUrl : item.url,
             });
-        } catch (error) {
+        } catch (error: any) {
             const msg = handleRuntypeFail(error);
             console.log(msg);
             return { success: false, message: msg }
@@ -967,7 +981,7 @@ async function getWebhosePosts(config: Static<typeof Webhose>, identity: Static<
                 let processedValues = [];
                 for (let k = 0; k < values.length; k++) {
                     const v = values[k];
-                    
+
                     if (v.status === 'fulfilled') {
                         processedValues.push(v.value.data)
                     }
@@ -1012,7 +1026,7 @@ async function getWebhosePosts(config: Static<typeof Webhose>, identity: Static<
  * @param lgr logger function
  * @param proxyConfig config object for proxy service to use
  * @param testLevel 0-4 indicating what test data should be returned, 0 is normal
- * @returns outcome with ordered list of posts
+ * @returns Success or Failure Message Response with ordered list of posts
  */
 async function getRSSPosts(config: Static<typeof RSS>, identity: Static<typeof Identity>, lgr: Function = () => { /* no log */ }, proxyConfig: ProxyConfig = false, testLevel = 0): Promise<DataResponse> {
     let feed;
@@ -1040,7 +1054,7 @@ async function getRSSPosts(config: Static<typeof RSS>, identity: Static<typeof I
         lgr('Parsing feed data')
         const rp = new RSSParser();
         feed = await rp.parseString(rss);
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -1055,14 +1069,10 @@ async function getRSSPosts(config: Static<typeof RSS>, identity: Static<typeof I
         }
     }
 
-    // ensure it was created using the correct generator
+    // warn if this is not a substack feed
     if (feed.generator !== 'Substack') {
-        const message = 'Feed was not generated using Substack';
+        const message = 'Feed was not generated using Substack, attempting to proceed anyways';
         lgr(message);
-        return {
-            success: false,
-            message,
-        }
     }
 
     // filter feed items to remove dupes
@@ -1135,10 +1145,10 @@ async function getRSSPosts(config: Static<typeof RSS>, identity: Static<typeof I
                 title: item.title || '',
                 geo: config.defaults.geo || '',
                 politicalSubdivision: config.defaults.politicalSubdivision || '',
-                image: item.enclosure.url || config.defaults.image || '',
+                image: item.enclosure?.url || config.defaults.image || '',
                 canonicalUrl: item.link || '',
             });
-        } catch (error) {
+        } catch (error: any) {
             const msg = handleRuntypeFail(error);
             return { success: false, message: msg }
         }
@@ -1155,7 +1165,7 @@ async function getRSSPosts(config: Static<typeof RSS>, identity: Static<typeof I
             let processedValues = [];
             for (let k = 0; k < values.length; k++) {
                 const v = values[k];
-                
+
                 if (v.status === 'fulfilled') {
                     processedValues.push(v.value.data)
                 }
@@ -1199,7 +1209,7 @@ async function getRSSPosts(config: Static<typeof RSS>, identity: Static<typeof I
  * @param lgr logger function
  * @param proxyConfig config object for proxy service to use
  * @param testLevel 0-4 indicating what test data should be returned, 0 is normal
- * @returns outcome of request including chrono list of tweets as posts
+ * @returns Success or Failure Message Response including chronological list of tweets as posts
  */
 async function getTwitterPosts(config: Static<typeof Twitter>, identity: Static<typeof Identity>, lgr: Function = () => { /* no log */ }, proxyConfig: ProxyConfig = false, testLevel = 0): Promise<DataResponse> {
     // set current config values
@@ -1289,7 +1299,7 @@ async function getTwitterPosts(config: Static<typeof Twitter>, identity: Static<
                     passed = true
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
             const msg = handleRuntypeFail(error);
             return { success: false, message: msg }
         }
@@ -1433,7 +1443,7 @@ async function getTwitterPosts(config: Static<typeof Twitter>, identity: Static<
                 canonicalUrl: `https://twitter.com/${config.username}/status/${twt.id_str}` || '',
                 reply,
             });
-        } catch (error) {
+        } catch (error: any) {
             const msg = handleRuntypeFail(error);
             return { success: false, message: msg }
         }
@@ -1474,16 +1484,16 @@ async function getTwitterPosts(config: Static<typeof Twitter>, identity: Static<
 }
 
 /**
- * Access the specified sitemap and return the valid urls as posts.
+ * Access the specified sitemap and return valid urls as posts.
  * Urls are first filtered by the lastmod property and then filtered by
- * their path (if both include and exclude are provided exclude is ignored).
+ * their path (if both include and exclude are provided, exclude is ignored).
  *
  * @param config sitemap crawl config
  * @param identity identity object to make posts with
  * @param lgr logger function
  * @param proxyConfig config object for proxy service to use
  * @param testLevel 0-4 indicating what test data should be returned, 0 is normal
- * @returns outcome of request including list of valid articles retrieved through the sitemap
+ * @returns Success or Failure Message Response including list of valid articles retrieved through the sitemap
  */
 async function getSitemapPosts(config: Static<typeof Sitemap>, identity: Static<typeof Identity>, lgr: Function = () => { /* no log */ }, proxyConfig: ProxyConfig = false, testLevel = 0): Promise<DataResponse> {
     // setup sitemapper
@@ -1573,7 +1583,7 @@ async function getSitemapPosts(config: Static<typeof Sitemap>, identity: Static<
 
                 try {
                     ogsData = await ogs(options);
-                } catch (error) {
+                } catch (error: any) {
                     console.error(error);
                     continue;
                 }
@@ -1600,7 +1610,7 @@ async function getSitemapPosts(config: Static<typeof Sitemap>, identity: Static<
         if (testLevel !== 2) {
             posts = await concurrentPromises(poolParams, createUrlPost, 10);
         }
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -1639,7 +1649,7 @@ async function getSitemapPosts(config: Static<typeof Sitemap>, identity: Static<
                 }
 
                 finalPosts.push(post);
-            } catch (error) {
+            } catch (error: any) {
                 const msg = handleRuntypeFail(error);
                 lgr(msg);
             }
@@ -1658,7 +1668,7 @@ async function getSitemapPosts(config: Static<typeof Sitemap>, identity: Static<
 }
 
 /**
- * Filter an array of url strings based on the provided filters
+ * Filter an array of url strings based on provided filters
  * and the post history map.
  *
  * @param urls array of urls to filter
@@ -1671,7 +1681,7 @@ async function filterCrawlUrls(urls: string[], filters: Static<typeof CrawlFilte
     let filteredUrls: string[] = [];
     try {
         CrawlFilters.check(filters);
-    } catch (error) {
+    } catch (error: any) {
         return [];
     }
 
@@ -1822,14 +1832,14 @@ async function filterCrawlUrls(urls: string[], filters: Static<typeof CrawlFilte
 }
 
 /**
- * Search for a username on twitter
+ * Search for a username on twitter.
  *
  * @param username twitter user username
  * @param gt twitter guest token
  * @param ua current user agent
  * @param scroll page to scroll to
  * @param proxyConfig config object for proxy service to use
- * @returns full twitter api response obj
+ * @returns full twitter api response object
  */
 async function searchTwitter(username: string, gt: string, ua: string, scroll = '', proxyConfig: ProxyConfig = false): Promise<DataResponse> {
     const vResp = getVars('TWITTER_TOKEN');
@@ -1902,7 +1912,7 @@ async function searchTwitter(username: string, gt: string, ua: string, scroll = 
         const resp = await axios.get(url.href, config);
 
         data = resp.data;
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -1944,16 +1954,16 @@ async function getTwitterGuestToken(username: string, ua: string, proxyConfig: P
         const matches = resp.data.match(reg);
 
         return matches[1] || '';
-    } catch (error) {
+    } catch (error: any) {
         return ''
     }
 }
 
 /**
- * Get the path to an crawl dir
+ * Get the path to a crawler directory.
  *
  * @param did optional crawl did
- * @returns path to crawl dir
+ * @returns path to crawler directory
  */
 function crawlPath(did = ''): string {
     let PATH = `${BASE_PATH}`
@@ -1970,14 +1980,14 @@ function crawlPath(did = ''): string {
 
 /**
  * Add the infoHash and link of a new post
- * to a crawl configs history for use with thread
+ * to a crawler configuration's history for use with thread
  * assembly.
  *
  * @param infoHash infoHash of new post
  * @param link canonicalUrl of new post
  * @param did crawl config did
  * @param type type of crawl being updated
- * @returns success of update
+ * @returns Success or Failure Message Response
  */
 function updateCrawlHistory(infoHash: string, link: string, did: string, type: CrawlType): DataResponse {
     const path = `${crawlPath(did)}/history`;
@@ -1985,7 +1995,7 @@ function updateCrawlHistory(infoHash: string, link: string, did: string, type: C
 
     try {
         appendFileSync(path, data);
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -2025,7 +2035,7 @@ async function getCrawlHistory(did: string, reverse = false): Promise<Map<string
                 history.set(values[0], values[1]);
             }
         })
-    } catch (error) {
+    } catch (error: any) {
         return history;
     }
 

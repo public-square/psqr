@@ -10,6 +10,11 @@ import {JwsPost} from '../types/post';
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Crawl new Posts from feeds and publish them.
+ * If no arguments are specified, this will use the defaults.
+ * If you want to crawl multiple configs, use stdin or set them as the defaults.
+ */
 export default class Crawl extends Command {
     static description = `Crawl new Posts from feeds and publish them.
 Don't specify any arguments in order to use the defaults.

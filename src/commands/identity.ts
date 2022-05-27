@@ -9,8 +9,11 @@ import { handleRuntypeFail } from '../functions/utility';
 const ora = require('ora');
 const util = require('util');
 
+/**
+ * Lists out all saved and currently available identities.
+ */
 export default class Identity extends Command {
-    static description = `List saved identities. 
+    static description = `List saved identities.
 This command lists the identities that are currently saved and available.
 `
 

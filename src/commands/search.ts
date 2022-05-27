@@ -6,6 +6,9 @@ import { LogInput, log, generateLogInput } from '../functions/log';
 
 const ora = require('ora');
 
+/**
+ * Search ElasticSearch for a specified string.
+ */
 export default class Search extends Command {
     static description = 'Search ElasticSearch for a specific string'
 
@@ -30,7 +33,7 @@ export default class Search extends Command {
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.query === null) {
+        if (typeof args.query === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided')
             return runCommand(['post', '-h']);

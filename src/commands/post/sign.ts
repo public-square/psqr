@@ -8,6 +8,9 @@ import { getIdentity } from '../../functions/identity';
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Parses post JSON and signs it with specified key.
+ */
 export default class PostSign extends Command {
     static description = 'Parse post JSON and sign it with specified key'
 
@@ -32,7 +35,7 @@ export default class PostSign extends Command {
 
         if (flags.stdin === true) args.data = await getStdin();
 
-        if (args.data === null || args.data === '') {
+        if (typeof args.data === 'undefined' || args.data === '') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['post:sign', '-h']);

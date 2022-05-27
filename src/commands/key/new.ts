@@ -4,8 +4,11 @@ import { addIdentity, addNewKeyPair, getFullIdentity } from '../../functions/ide
 
 const ora = require('ora');
 
+/**
+ * Creates new Keys and adds them to a preexisting identity.
+ */
 export default class KeyNew extends Command {
-    static description = `Create new Keys and add them to a pre-existing identity.
+    static description = `Create new Keys and add them to a preexisting identity.
 `
 
     static flags = {
@@ -28,14 +31,14 @@ export default class KeyNew extends Command {
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.did === null && args.names === null) {
+        if (typeof args.did === 'undefined' || typeof args.names === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['key:new', '-h']);
         }
 
         const did = args.did;
-        const keyNames = args.names.split(',');
+        const keyNames = args.names.replace(/\s/g, '').split(',');
 
         // retrieve identity
         const idResp = await getFullIdentity(did);

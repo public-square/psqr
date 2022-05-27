@@ -10,6 +10,10 @@ const getStdin = require('get-stdin');
 const ora = require('ora');
 
 /**
+ * Creates Post JSON using input data.
+ *
+ * e.g.
+ * ```typescript
  * psqr post:create Hello \
  *      --raw \
  *      --description 'This is a description' \
@@ -19,6 +23,7 @@ const ora = require('ora');
  *      --politicalSubdivision 'US/New_York/Broome' \
  *      --image 'https://newpress.co/images/logo-dark-wide.png'
  *      --canonicalUrl 'https://newpress.co/posts/hello'
+ * ```
  */
 export default class PostCreate extends Command {
     static description = 'Create Post JSON with input data'
@@ -55,7 +60,7 @@ export default class PostCreate extends Command {
 
         if (flags.stdin === true) args.body = await getStdin();
 
-        if (args.body === null || args.body === '') {
+        if (typeof args.body === 'undefined' || args.body === '') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['post:create', '-h']);

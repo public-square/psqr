@@ -1,14 +1,15 @@
 import { Command, flags, run as runCommand } from '@oclif/command'
-import { parseJwk } from 'jose/jwk/parse';
-import { CompactSign } from 'jose/jws/compact/sign';
+import { importJWK, CompactSign } from 'jose';
 
-import { parseKidKey, verifyAdminIdentity } from '../../functions/identity';
-import { createIdentityAxiosClient } from '../../functions/utility';
+import { parseKidKey, verifyAdminIdentity, createIdentityAxiosClient } from '../../functions/identity';
 
 const ora = require('ora');
 
 const encoder = new TextEncoder();
 
+/**
+ * Deletes an Identity from a Public Square Network hosting it.
+ */
 export default class IdentityDelete extends Command {
     static description = 'Remove an Identity from a Public Square Network that hosts Identities.';
 
@@ -47,7 +48,7 @@ export default class IdentityDelete extends Command {
 
         // parse data
         const keyPair = idResp.identity.keyPairs[0];
-        const key = await parseJwk(keyPair.private);
+        const key = await importJWK(keyPair.private);
 
         const keyId = parseKidKey(keyPair.kid);
         if (keyId === false) return { success: false, message: 'Unable to parse key name' };

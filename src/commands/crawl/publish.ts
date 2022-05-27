@@ -9,8 +9,12 @@ import { parseBareDid } from '../../functions/identity';
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Publishes Posts stored with a Crawler.
+ * These Posts will be signed, published to the Broadcasters, and then deleted unless otherwise specified.
+ */
 export default class CrawlPublish extends Command {
-    static description = `Publish posts stored with and Crawler.
+    static description = `Publish posts stored with a Crawler.
 All posts that are in the posts dir of the Crawler will be signed,
 published to the broadcasters, and then deleted unless otherwise specified.
 `

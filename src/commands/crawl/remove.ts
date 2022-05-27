@@ -5,6 +5,9 @@ import { crawlTypes, removeCrawl } from '../../functions/crawl';
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Removes Crawl Configurations.
+ */
 export default class CrawlRemove extends Command {
     static description = `Remove Crawl configs.
 `

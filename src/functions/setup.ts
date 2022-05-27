@@ -27,11 +27,11 @@ const keyImportChoices = [
 const defaultTwitterToken = 'AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA';
 
 /**
- * Prompt the user for info on how they want to setup their Identity
+ * Prompt the user for desired Identity setup
  *
- * @returns idSetup reponse object with combined responses
+ * @returns idSetup data reponse object with combined responses
  */
-async function promptIdentitySetup(): Promise<any> {
+async function promptIdentitySetup(): Promise<DataResponse> {
     // only able to add or create right now
     const addId = await inquirer.prompt({
         type: 'list',
@@ -49,18 +49,7 @@ async function promptIdentitySetup(): Promise<any> {
                 {
                     type: 'input',
                     name: 'did',
-                    message: 'What is the DID string of the identity you are adding? Expected format: did:psqr:{hostname}/{path}',
-                    validate: (did: string) => {
-                        // verify that the did supplied is valid
-                        try {
-                            DID_PSQR.check(did);
-                        } catch (error) {
-                            const msg = handleRuntypeFail(error);
-                            return msg
-                        }
-
-                        return true;
-                    }
+                    message: 'What is the DID string of the identity you are adding? Expected format: did:psqr:{hostname}/{path}'
                 },
                 {
                     type: 'list',
@@ -74,6 +63,14 @@ async function promptIdentitySetup(): Promise<any> {
                 ...idSetup,
                 ...didPrompt
             };
+
+            // verify that the did supplied is valid
+            try {
+                DID_PSQR.check(didPrompt.did);
+            } catch (error: any) {
+                const msg = handleRuntypeFail(error);
+                return { success: false, message: msg }
+            }
 
             // If creating new keys prompt the user
             const keyQuery = [];
@@ -103,18 +100,7 @@ async function promptIdentitySetup(): Promise<any> {
                 {
                     type: 'input',
                     name: 'did',
-                    message: 'What is the DID string of the Identity you are creating? Expected format: did:psqr:{hostname}/{path}',
-                    validate: (did: string) => {
-                        // verify that the did supplied is valid
-                        try {
-                            DID_PSQR.check(did);
-                        } catch (error) {
-                            const msg = handleRuntypeFail(error);
-                            return msg
-                        }
-
-                        return true;
-                    }
+                    message: 'What is the DID string of the Identity you are creating?'
                 },
                 {
                     type: 'input',
@@ -124,7 +110,8 @@ async function promptIdentitySetup(): Promise<any> {
                 {
                     type: 'input',
                     name: 'keyNames',
-                    message: 'What are the comma separated names of the keys you want to be created along with this Identity (usually admin, publish, list, or curate)?'
+                    message: 'What are the comma separated names of the keys you want to be created along with this Identity (usually admin, publish, list, or curate)?',
+                    default: 'admin'
                 }
             ]);
             idSetup = {
@@ -134,12 +121,15 @@ async function promptIdentitySetup(): Promise<any> {
             break;
     }
 
-    return idSetup;
+    return {
+        success: true,
+        message: 'Successfully retrieved all required identity info',
+        data: idSetup
+    }
 }
 
 /**
- * Take identity setup and create or import the identity as specified,
- * then save that identity as the default
+ * Following the setup process of an Identity, create or import the identity, then save as default
  *
  * @param idSetup inquirer response object containing responses from promptIdentitySetup
  * @param oraOutput ora variable to update with appropriate status message
@@ -262,7 +252,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
                         private: JSON.parse(privKey),
                         public: JSON.parse(pubKey),
                     })
-                } catch (error) {
+                } catch (error: any) {
                     const msg = handleRuntypeFail(error);
                     return {
                         success: false,
@@ -287,7 +277,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
         default:
             let keyNames: string[] = [];
             if (idSetup.keyNames !== '' && idSetup.keyNames.split(',').length > 0) {
-                keyNames = idSetup.keyNames.split(',');
+                keyNames = idSetup.keyNames.replace(/\s/g, '').split(',');
             }
             const info: Static<typeof PublicInfo> = {
                 name: idSetup.idName,
@@ -296,7 +286,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
             // validate publicIdentity
             try {
                 PublicInfo.check(info)
-            } catch (error) {
+            } catch (error: any) {
                 const msg = handleRuntypeFail(error);
                 oraOutput.fail(msg);
                 return {
@@ -341,7 +331,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
 }
 
 /**
- * Prompt the user for info on the network they want to add
+ * Prompt the user for network setup information
  *
  * @returns netSetup response object with combined responses
  */
@@ -370,15 +360,25 @@ async function promptNetworkSetup(): Promise<any> {
         }
     ]);
 
+    const iDomainDefault = `did:psqr:${networkPrompt['domain']}`;
+    const iDomainPrompt = await inquirer.prompt([
+        {
+            type: 'input',
+            name: 'domains',
+            message: 'What is the comma separated list of identityDomains that this network manages for DID updates?',
+            default: iDomainDefault
+        }
+    ]);
+
     return {
         ...networkPrompt,
-        ...apiPrompt
+        ...apiPrompt,
+        identityDomains: iDomainPrompt.domains.replace(/\s/g, '').split(',')
     }
 }
 
 /**
- * Take the network setup and add it to psqr,
- * then save it as the default
+ * Persist the network setup data as default and add it to psqr.
  *
  * @param netSetup inquirer response object containing responses from promptNetworkSetup
  * @param oraOutput ora variable to update with appropriate status message
@@ -392,6 +392,7 @@ async function persistNetworkSetup(netSetup: any, oraOutput: any, force = false)
         config = NetworkConfig.check({
             name: netSetup['name'],
             domain: netSetup['domain'],
+            identityDomains: netSetup['identityDomains'],
             content: {
                 search:  {
                     url: `https://search.${netSetup['domain']}`
@@ -415,7 +416,7 @@ async function persistNetworkSetup(netSetup: any, oraOutput: any, force = false)
                 }
             }
         })
-    } catch (error) {
+    } catch (error: any) {
         const msg = 'Failed to assemble network config because: ' +handleRuntypeFail(error);
         if (force === false) oraOutput.fail(msg);
 
@@ -468,7 +469,7 @@ async function persistNetworkSetup(netSetup: any, oraOutput: any, force = false)
 }
 
 /**
- * Prompt the user for account values for the proxy they want to use
+ * Prompt the user for Proxy Setup Information
  *
  * @returns proxySetup response object with combined responses
  */
@@ -501,7 +502,7 @@ async function promptProxySetup(): Promise<any> {
 }
 
 /**
- * Take the proxy setup and save those values as env vars
+ * Persist the Proxy Initialization Data as environment variables
  *
  * @param proxySetup inquirer response object containing responses from promptProxySetup
  * @returns data response describing success
@@ -556,8 +557,8 @@ async function persistProxySetup(proxySetup: any): Promise<DataResponse> {
 }
 
 /**
- * Prompt the user for info on what crawls they want to add.
- * This will go through one and then ask the user if they want to add another until they say no.
+ * Prompt the user for infomation on crawlers that they want to add.
+ * This function will prompt for additional crawler creations.
  *
  * @param identity identity object that was generated earlier by the user
  * @returns crawlSetup response array with info for all requested crawls
@@ -703,12 +704,12 @@ async function promptCrawlSetup(identity: Static<typeof Identity>): Promise<any[
 }
 
 /**
- * Loop throught the provided crawl setups and create the appropriate crawl configs,
- * then save them as the defaults.
+ * Persist the initialized crawlers via a loop and create appropriate crawler configurations.
+ * Save these configurations as defaults.
  *
  * @param crawlSetup array of inquirer response objects containing responses from promptCrawlSetup
  * @param oraOutput ora variable to update with appropriate status message
- * @returns data response describing success
+ * @returns Success or Failure Data Response
  */
 async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<DataResponse> {
     // determine user readable description of setup

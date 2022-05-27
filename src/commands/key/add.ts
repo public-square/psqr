@@ -8,8 +8,11 @@ import { KeyPair } from '../../types/identity';
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Adds a preexisting Key to an identity stored in the CLI configuration.
+ */
 export default class KeyAdd extends Command {
-    static description = `Add a pre-existing Key to an identity stored in the cli config.
+    static description = `Add a preexisting Key to an identity stored in the cli config.
 Specify the path to the directory containing them with --path,
 or pass the entire KeyPair as a JSON string with --stdin.
 `
@@ -34,7 +37,7 @@ or pass the entire KeyPair as a JSON string with --stdin.
         const oraStart = ora('Preparing command...').start();
 
         const keySpecified = typeof flags.path !== 'undefined' || flags.stdin;
-        if (args.kid === null || keySpecified === false) {
+        if (typeof args.kid === 'undefined' || keySpecified === false) {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['key:add', '-h']);
@@ -92,10 +95,11 @@ or pass the entire KeyPair as a JSON string with --stdin.
             if (kfResp.success === false) return oraValid.fail('Unable to find keys at ' + flags.path)
 
             // separate out key files
-            let privKey, pubKey;
+            let privKey;
+            let pubKey;
             for (let i = 0; i < kfResp.files.length; i++) {
                 const f = kfResp.files[i];
-                
+
                 if (typeof f === 'string' || typeof f.data !== 'string') continue;
                 if (f.path.includes(privPath)) {
                     privKey = f.data;

@@ -4,6 +4,9 @@ import { removeNetworkConfig } from '../../functions/network'
 
 const ora = require('ora');
 
+/**
+ * Removes a Networks Configuration based on a list of Networks.
+ */
 export default class NetworkRemove extends Command {
     static description = 'Remove Network configs'
 
@@ -23,7 +26,7 @@ export default class NetworkRemove extends Command {
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.domains === null) {
+        if (typeof args.domains === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided')
             return runCommand(['network:remove', '-h']);

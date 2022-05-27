@@ -11,6 +11,10 @@ const getStdin = require('get-stdin');
 const ora = require('ora');
 
 /**
+ * Creates a post, signs it with specified key, and publishes it to a Broadcaster.
+ *
+ * e.g.
+ * ```typescript
  * psqr post Hello \
  *      --raw \
  *      --description 'This is a description' \
@@ -20,6 +24,7 @@ const ora = require('ora');
  *      --politicalSubdivision 'US/New_York/Broome' \
  *      --image 'https://newpress.co/images/logo-dark-wide.png'
  *      --canonicalUrl 'https://newpress.co/posts/hello'
+ * ```
  */
 export default class Post extends Command {
     static description = 'Create post, sign it with specified key, and publish to Broadcaster'
@@ -55,7 +60,7 @@ export default class Post extends Command {
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.body === null) {
+        if (typeof args.body === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['post', '-h']);

@@ -4,6 +4,9 @@ import { setDefaultNetwork } from '../../functions/network'
 
 const ora = require('ora');
 
+/**
+ * Sets the default Network(s).
+ */
 export default class NetworkDefault extends Command {
     static description = `Set the default Network(s)
 Default behavior is to add specified Network(s) to defaults.
@@ -26,7 +29,7 @@ Default behavior is to add specified Network(s) to defaults.
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.domains === null) {
+        if (typeof args.domains === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided')
             return runCommand(['network:default', '-h']);

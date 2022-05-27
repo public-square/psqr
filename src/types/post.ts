@@ -3,6 +3,7 @@ import { Url } from './base-types';
 
 import { PublicKey, PublicInfo } from './identity';
 
+/** Article Package Information */
 const publicSquare = Record({
     package: Record({
         geo: String,
@@ -24,18 +25,21 @@ const publicSquare = Record({
     }),
 });
 
+/** Article Provenance */
 const provenance = Record({
     signature: String,
     jwk: PublicKey,
     publisher: PublicInfo,
 });
 
+/** Article Files */
 const file = Record({
     name: String,
     offset: Number,
     length: String,
 });
 
+/** Article Information  */
 const Post = Record({
     name: String,
     infoHash: String,
@@ -50,6 +54,7 @@ const Post = Record({
     }),
 });
 
+/** Skeleton for Article */
 const PostSkeleton = Record({
     body: String,
     description: String,
@@ -63,6 +68,9 @@ const PostSkeleton = Record({
     reply: String.optional(),
 });
 
+/** Json Web Signature of Article
+ * @returns true or error message
+ */
 const JwsPost = Record({
     token: String.withConstraint(
         str => /[\d\w-]+\.[\d\w-]+\.[\d\w-]+/g.test(str) || 'Invalid JWS specified'

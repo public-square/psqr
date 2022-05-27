@@ -4,6 +4,9 @@ import { setDefaultIdentity } from '../../functions/identity';
 
 const ora = require('ora');
 
+/**
+ * Set the Default Identity using the KID.
+ */
 export default class IdentityDefault extends Command {
     static description = 'Set the default identity using the KID'
 
@@ -23,7 +26,7 @@ export default class IdentityDefault extends Command {
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.did === null) {
+        if (typeof args.did === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['identity:default', '-h']);

@@ -3,11 +3,15 @@ import { Static } from 'runtypes';
 
 import { createIdentity, addIdentity, setDefaultIdentity } from '../../functions/identity';
 import { handleRuntypeFail } from '../../functions/utility';
+import { KID_PSQR } from '../../types/base-types';
 import { PublicInfo } from '../../types/identity';
 
 const getStdin = require('get-stdin');
 const ora = require('ora');
 
+/**
+ * Creates a new default identity from a provided KID URL.
+ */
 export default class IdentityNew extends Command {
     static description = `Create a new default identity
 This command creates a new identity from a provided KID URL,
@@ -29,7 +33,7 @@ This only supports creating did:psqr identities.`
     static args = [
         {
             name: 'kid',
-            description: 'KID URL string, expected format: did:psqr:{hostname}/{path}#{keyId}',
+            description: 'KID PSQR string, expected format: did:psqr:{hostname}/{path}#{keyId}',
         },
     ]
 
@@ -38,13 +42,25 @@ This only supports creating did:psqr identities.`
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.kid === null || (typeof flags.name === 'undefined' && flags.stdin === false)) {
+        if (typeof args.kid === 'undefined') {
             // if you want to run another command it must be returned like so
-            oraStart.fail('Insufficient arguments provided')
+            oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['identity:new', '-h']);
         }
 
-        const kid = args.kid;
+        if (typeof flags.name === 'undefined' && flags.stdin === false) {
+            oraStart.fail('Insufficient arguments provided; Name needs to be specified as a flag or with stdin\n')
+            return runCommand(['identity:new', '-h']);
+        }
+
+        // validate and assign kid
+        let kid: Static<typeof KID_PSQR>;
+        try {
+            kid = KID_PSQR.check(args.kid);
+        } catch (error) {
+            oraStart.fail('Invalid KID PSQR string specified, expected format: did:psqr:{hostname}/{path}#{keyId}');
+            return false;
+        }
 
         oraStart.succeed('Command ready')
         const oraCreate = ora('Creating new identity...').start();
@@ -54,7 +70,7 @@ This only supports creating did:psqr identities.`
         if (flags.stdin) {
             const stdInfo = await getStdin();
             info = JSON.parse(stdInfo);
-        } else if (typeof flags.name == 'string') {
+        } else if (typeof flags.name === 'string') {
             const newInfo: Static<typeof PublicInfo> = {
                 name: flags.name,
             };
@@ -67,7 +83,7 @@ This only supports creating did:psqr identities.`
 
             info = newInfo;
         } else {
-            return oraStart.fail('Invalid name provided');
+            return oraCreate.fail('Invalid name provided');
         }
 
         // validate publicIdentity

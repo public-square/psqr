@@ -7,6 +7,9 @@ import { RSS } from '../../../types/crawl';
 
 const ora = require('ora');
 
+/**
+ * Creates a new RSS Crawl Configuration.
+ */
 export default class CrawlAddRss extends Command {
     static description = 'Create a new RSS Crawl config'
 
@@ -34,7 +37,7 @@ export default class CrawlAddRss extends Command {
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.kid === null || args.url === null) {
+        if (typeof args.kid === 'undefined' || typeof args.url === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided')
             return runCommand(['crawl:add:rss', '-h']);

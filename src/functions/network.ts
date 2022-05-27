@@ -15,12 +15,12 @@ const NET_VAR = 'DEFAULT_NETWORKS';
 const domReg = /^(((?!\-))(xn\-\-)?[a-z0-9\-_]{0,61}[a-z0-9]{1,1}\.)*(xn\-\-)?([a-z0-9\-]{1,61}|[a-z0-9\-]{1,30})\.[a-z]{2,}$/
 
 /**
- * Get the network configs of the networks specified.
- * If domain is skipped or false return current default configs.
- * If domain is true return all available configs.
+ * Get the network configunations for the specified networks.
+ * If domain is skipped or false, return current default configs.
+ * If domain is true, return all available configs.
  *
  * @param domains colon separated list of network domains
- * @returns outcome of request including an array of the configs
+ * @returns Success or Failure Message Response including an array of the configs
  */
 async function getNetworkConfig(domains: string | boolean = false): Promise<DataResponse> {
     const EVAR = NET_VAR;
@@ -72,12 +72,20 @@ async function getNetworkConfig(domains: string | boolean = false): Promise<Data
                 return JSON.parse(f.data)
             }
         });
+
+        // validate network configs
+        for (let j = 0; j < configs.length; j++) {
+            const config = configs[j];
+
+            NetworkConfig.check(config);
+        }
+
         return {
             success: true,
             message: `Successfully retrieved all requested network configs`,
             data: configs,
         };
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -85,11 +93,11 @@ async function getNetworkConfig(domains: string | boolean = false): Promise<Data
 
 /**
  * Remove specified networks completely.
- * If a specified network is a default it will be removed
+ * If a specified network is a default, it will be removed
  * from the list of defaults.
  *
  * @param domains colon separated list of network domains
- * @returns outcome of request including an array of the files deleted
+ * @returns Success or Failure Message Response including an array of the files deleted
  */
 async function removeNetworkConfig(domains: string): Promise<DataResponse> {
     const PATH = BASE_PATH;
@@ -126,7 +134,7 @@ async function removeNetworkConfig(domains: string): Promise<DataResponse> {
         // send request and pass on response
         const resp = await deleteFiles(files);
         return resp;
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }
@@ -134,12 +142,12 @@ async function removeNetworkConfig(domains: string): Promise<DataResponse> {
 
 /**
  * Set the default network config(s).
- * Unless indicated otherwise by param overwrite,
+ * Unless indicated otherwise,
  * specified domains will be added to current default list.
  *
  * @param domains colon separated list of network domains
  * @param overwrite should the list of domains completely overwrite current defaults
- * @returns outcome of request including the current defaults
+ * @returns Success or Failure Message Response including the current defaults
  */
 function setDefaultNetwork(domains: string, overwrite = false): DataResponse {
     const EVAR = NET_VAR;
@@ -193,9 +201,9 @@ function setDefaultNetwork(domains: string, overwrite = false): DataResponse {
 }
 
 /**
- * Get an array of the default domains for the network config
+ * Get an array of the default domains for the network configuration.
  *
- * @returns outcome of request including an array of the default domains
+ * @returns Success or Failure Message Response including an array of the default domains
  */
 function getDefaultNetwork(): DataResponse {
     const resp = getVars(NET_VAR);
@@ -219,11 +227,10 @@ function getDefaultNetwork(): DataResponse {
 }
 
 /**
- * Create a Network config and save it.
- * Can be used to update configs as well.
- * 
+ * Create and save a Network Configuration that can be used to update configurations.
+ *
  * @param config Network config object
- * @returns outcome of creation attempt
+ * @returns Success or Failure Message Response
  */
 function createNetworkConfig(config: Static<typeof NetworkConfig>): DataResponse {
     // ensure domain doesn't contain invalid characters
@@ -237,7 +244,7 @@ function createNetworkConfig(config: Static<typeof NetworkConfig>): DataResponse
         // validate config and then write to file
         NetworkConfig.check(config);
         writeFileSync(`${PATH}/config.json`, JSON.stringify(config))
-    } catch (error) {
+    } catch (error: any) {
         const msg = handleRuntypeFail(error);
         return { success: false, message: msg }
     }

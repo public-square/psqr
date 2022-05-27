@@ -9,6 +9,9 @@ import { PublicInfo } from '../../types/identity';
 const ora = require('ora');
 const getStdin = require('get-stdin');
 
+/**
+ * Creates a new identity from a provided KID and adds it to the PSQR Configuration.
+ */
 export default class IdentityCreate extends Command {
     static description = `Create a new identity from a provided KID and add it to the psqr config.
 This only supports creating did:psqr identities.`
@@ -30,7 +33,7 @@ This only supports creating did:psqr identities.`
     static args = [
         {
             name: 'kid',
-            description: 'KID string, expected format: did:psqr:{hostname}/{path}#{keyId}',
+            description: 'KID string, expected format: did:psqr:{hostname}/{path}#{keyId}. If key is omitted a default publish key will be created.',
         },
     ]
 
@@ -39,10 +42,15 @@ This only supports creating did:psqr identities.`
 
         const oraStart = ora('Preparing command...').start();
 
-        if (args.kid === null || (typeof flags.name === 'undefined' && flags.stdin === false)) {
+        if (typeof args.kid === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['identity:create', '-h']);
+        }
+
+        if (typeof flags.name === 'undefined' && flags.stdin === false) {
+            oraStart.fail('Insufficient arguments provided; Name needs to be specified as a flag or with stdin\n')
+            return runCommand(['identity:new', '-h']);
         }
 
         const kid = args.kid;
@@ -52,7 +60,7 @@ This only supports creating did:psqr identities.`
 
         let keyNames: string[] = [];
         if (typeof flags.keys !== 'undefined' && flags.keys !== '' && flags.keys.split(',').length > 0) {
-            keyNames = flags.keys.split(',');
+            keyNames = flags.keys.replace(/\s/g, '').split(',');
         }
 
         // parse or assemble publicIdentity
@@ -60,7 +68,7 @@ This only supports creating did:psqr identities.`
         if (flags.stdin) {
             const stdInfo = await getStdin();
             info = JSON.parse(stdInfo);
-        } else if (typeof flags.name == 'string') {
+        } else if (typeof flags.name === 'string') {
             const newInfo: Static<typeof PublicInfo> = {
                 name: flags.name,
             };
