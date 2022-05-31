@@ -6,7 +6,7 @@
   "bin": {
     "psqr": "./bin/run"
   },
-  "bugs": "https://github.com/newpress/public-square-client-cli/issues",
+  "bugs": "https://github.com/public-square/psqr/issues",
   "devDependencies": {
     "@types/node": "^10.17.56",
     "devextreme-showdown": "^1.0.1",
@@ -27,7 +27,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/newpress/public-square-client-cli",
+  "homepage": "https://github.com/public-square/psqr",
   "keywords": [
     "oclif",
     "psqr",
@@ -45,7 +45,7 @@
       "init": "./lib/hooks/defaults"
     }
   },
-  "repository": "newpress/public-square-client-cli",
+  "repository": "public-square/psqr",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc.json -f table",
