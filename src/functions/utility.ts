@@ -7,7 +7,6 @@ import { Url } from '../types/base-types'
 const parseDuration = require('parse-duration');
 const axios = require('axios').default;
 const proxyAgent = require('https-proxy-agent');
-const https = require('https');
 
 /** File Configuration */
 export interface FileConfig {
@@ -89,7 +88,7 @@ function appendLogFile(file: FileConfig): DataResponse {
  */
 function generateLogger(path: string): Function {
     return (data: any, divider = false) => {
-        //console.log(data);
+        // console.log(data);
         if (data === undefined) return;
         // add divider before if true
         if (divider) {
@@ -289,17 +288,21 @@ function handleRuntypeFail(error: Error | any): string {
         msg = error.stack + '\n' + msg;
     }
 
-    if (typeof error.details !== 'undefined') {
-        msg += '\n' + JSON.stringify(error.details, null, 4);
-    } else if (typeof error.result?.error !== 'undefined') {
-        msg += error.result.error;
-    } else if (typeof error.message !== 'undefined') {
-        msg += error.message;
-    } else {
-        msg += 'No message available';
+    switch (error) {
+        case typeof error.details !== 'undefined':
+            msg += '\n' + JSON.stringify(error.details, null, 4);
+            break;
+        case typeof error.result?.error !== 'undefined':
+            msg += error.result.error;
+            break;
+        case typeof error.message !== 'undefined':
+            msg += error.message;
+            break;
+        default:
+            msg += 'No message available';
     }
 
-    return msg
+    return msg;
 }
 
 /**

@@ -12,7 +12,7 @@ const defaults: Hook<'init'> = async function () {
     const defLang = 'en/US';
     const elang = 'DEFAULT_LANGUAGE';
     const enet = 'DEFAULT_NETWORKS'
-    const eVars = getVars([elang,enet]);
+    const eVars = getVars([elang, enet]);
 
     // set lang if no default
     if (typeof eVars[elang] === 'undefined' || eVars[elang] === '') {
@@ -33,9 +33,9 @@ const defaults: Hook<'init'> = async function () {
             name: 'Ology Newswire',
             domain: 'ology.com',
             identityDomains: [
-                'did:psqr:id.ology.com'
+                'did:psqr:id.ology.com',
             ],
-            api: 'https://broadcast.ology.com/api'
+            api: 'https://broadcast.ology.com/api',
         }
         const oraNet = ora(`Setting default network to ${netSetup.domain} since it is not set`).start();
         const netResp = await persistNetworkSetup(netSetup, null, true)
@@ -43,7 +43,7 @@ const defaults: Hook<'init'> = async function () {
             oraNet.succeed(`Default network is now ${netSetup.domain}`);
         } else {
             oraNet.fail(`Network setup failed because: ${netResp.message}. ` +
-                `Please try manually with these commands: \n\n` +
+                'Please try manually with these commands: \n\n' +
                 `psqr network:create ${netSetup.domain} '${netSetup.name}' --api="${netSetup.api}"\n` +
                 `psqr network:default ${netSetup.domain}`
             );

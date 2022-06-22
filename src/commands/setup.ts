@@ -22,28 +22,25 @@ It will set up your identity, keys, necessary networking, and any content crawli
     }
 
     async run() {
-        const { flags } = this.parse(Setup)
-
         // welcome header
         const logInput = generateLogInput(process.argv);
-        logInput.title = `Welcome to the PSQR setup utility`;
-        logInput.body = `This utility will prompt you for the all of the necessary info to get your environment up and running.`;
+        logInput.title = 'Welcome to the PSQR setup utility';
+        logInput.body = 'This utility will prompt you for the all of the necessary info to get your environment up and running.';
         log(logInput);
 
         // determine what the user wants to do with psqr
         const userOptions = [
             'Create and/or Manage an Identity',
             'Create and Publish content',
-            'Crawl and Publish content from other sources'
+            'Crawl and Publish content from other sources',
         ]
         const userType = await inquirer.prompt({
             type: 'list',
             name: 'type',
             message: 'What do you want to do with the PSQR client?',
             choices: userOptions,
-            default: 0
+            default: 0,
         });
-
 
         // setup language and network if necessary
         const defLang = 'en/US';
@@ -60,7 +57,7 @@ It will set up your identity, keys, necessary networking, and any content crawli
                 type: 'input',
                 name: 'lang',
                 message: 'What language will you be using?',
-                default: defLang
+                default: defLang,
             });
             setVars(`DEFAULT_LANGUAGE=${lang.lang}`, false);
 
@@ -72,7 +69,7 @@ It will set up your identity, keys, necessary networking, and any content crawli
                 oraNet.fail('Network setup cancelled because: ' + netResp.message);
                 return false;
             }
-            oraNet.succeed(`Network setup was successful.`);
+            oraNet.succeed('Network setup was successful.');
         }
 
         // determine identity setup and then persist
@@ -89,7 +86,7 @@ It will set up your identity, keys, necessary networking, and any content crawli
         // CONTENT CREATOR check
         if (userOptions.indexOf(userType.type) <= 0) {
             const msg = `Your environment is now completely set up for ${idSetup.data.did}.\n` +
-                `If you want to Propagate your Identity you can do so with the command:\n\n` +
+                'If you want to Propagate your Identity you can do so with the command:\n\n' +
                 `psqr identity:propagate ${idSetup.data.did}`
             return ora(msg).succeed();
         }
@@ -98,7 +95,7 @@ It will set up your identity, keys, necessary networking, and any content crawli
         // CONTENT CRAWLER check
         if (userOptions.indexOf(userType.type) <= 1) {
             const msg = `Your environment is now completely set to create content for ${idSetup.data.did}.\n` +
-                `You can create, sign, and publish a post with a command like:\n\n` +
+                'You can create, sign, and publish a post with a command like:\n\n' +
                 `psqr post 'Post body' \\
    --raw \\
    --description 'This is a description' \\
@@ -108,16 +105,16 @@ It will set up your identity, keys, necessary networking, and any content crawli
    --politicalSubdivision 'US/New_York/Broome' \\
    --image 'https://vpsqr.com/assets/ology-icon.png' \\
    --canonicalUrl 'https://vpsqr.com/posts/first'\n\n` +
-                `Or in separate steps with "psqr post:create", "psqr post:sign", and "psqr post:put".`
+                'Or in separate steps with "psqr post:create", "psqr post:sign", and "psqr post:put".'
             return ora(msg).succeed();
-        };
+        }
 
         // setup proxy if necessary
         const proxyConfirm = await inquirer.prompt({
             type: 'confirm',
             name: 'confirm',
             message: 'Do you want to setup network proxy variables?',
-            default: false
+            default: false,
         });
         if (proxyConfirm.confirm) {
             const oraProxy = ora();
@@ -127,7 +124,7 @@ It will set up your identity, keys, necessary networking, and any content crawli
                 oraProxy.fail('Proxy setup cancelled because: ' + proxyResp.message);
                 return false;
             }
-            oraProxy.succeed(`Proxy setup was successful. Use it with --proxy when applicable.`);
+            oraProxy.succeed('Proxy setup was successful. Use it with --proxy when applicable.');
         }
 
         // setup any crawlers that are needed
@@ -138,13 +135,13 @@ It will set up your identity, keys, necessary networking, and any content crawli
             oraCrawl.fail('Crawl setup cancelled because: ' + crawlResp.message);
             return false;
         }
-        oraCrawl.succeed(`Crawl setup was successful.`);
+        oraCrawl.succeed('Crawl setup was successful.');
 
         // end message for content crawler setup
         const msg = `Your environment is now completely set to crawl content for ${idSetup.data.did}.\n` +
-        `You can crawl, sign, and publish posts from all of the default crawls with the command:\n\n` +
-        `psqr crawl\n\n` +
-        `Or in separate steps with "psqr crawl:pull" and "psqr crawl:publish".`
+        'You can crawl, sign, and publish posts from all of the default crawls with the command:\n\n' +
+        'psqr crawl\n\n' +
+        'Or in separate steps with "psqr crawl:pull" and "psqr crawl:publish".'
         return ora(msg).succeed();
     }
 }

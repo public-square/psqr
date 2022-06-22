@@ -141,7 +141,7 @@ function getVars(vars: string | string[] = POSSIBLE_VARS): EnvVars {
     }
 
     // ensure each requested var is a possible var
-    let response: { [key: string]: string } = {};
+    const response: { [key: string]: string } = {};
     vars.forEach(v => {
         if (POSSIBLE_VARS.includes(v) === false) {
             return;

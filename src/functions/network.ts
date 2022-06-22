@@ -33,7 +33,7 @@ async function getNetworkConfig(domains: string | boolean = false): Promise<Data
         if (typeof evar === 'undefined' || evar === '') {
             return {
                 success: false,
-                message: `No domains passed and no default found`,
+                message: 'No domains passed and no default found',
             }
         }
         domains = evar;
@@ -46,7 +46,7 @@ async function getNetworkConfig(domains: string | boolean = false): Promise<Data
         if (domains === true) {
             const resp = readdirSync(PATH);
             if (resp.length === 0) {
-                return { success: false, message: `No configs present` }
+                return { success: false, message: 'No configs present' }
             }
             domainAr = resp;
         } else {
@@ -71,6 +71,8 @@ async function getNetworkConfig(domains: string | boolean = false): Promise<Data
             if (typeof f === 'object' && typeof f.data === 'string') {
                 return JSON.parse(f.data)
             }
+
+            return null;
         });
 
         // validate network configs
@@ -82,7 +84,7 @@ async function getNetworkConfig(domains: string | boolean = false): Promise<Data
 
         return {
             success: true,
-            message: `Successfully retrieved all requested network configs`,
+            message: 'Successfully retrieved all requested network configs',
             data: configs,
         };
     } catch (error: any) {
@@ -107,7 +109,7 @@ async function removeNetworkConfig(domains: string): Promise<DataResponse> {
     const domainAr = domains.split(':').filter(i => avail.indexOf(i) !== -1);
 
     // ensure there are domains left to remove
-    if (domainAr.length === 0) return { success: false, message: `No Network Configs available to remove` }
+    if (domainAr.length === 0) return { success: false, message: 'No Network Configs available to remove' }
 
     try {
         // remove any defaults
@@ -118,7 +120,7 @@ async function removeNetworkConfig(domains: string): Promise<DataResponse> {
 
             const set = setDefaultNetwork(newDef, true);
             if (set.success === false) {
-                return { success: false, message: `Unable to remove default network(s)` };
+                return { success: false, message: 'Unable to remove default network(s)' };
             }
         }
 
@@ -184,7 +186,7 @@ function setDefaultNetwork(domains: string, overwrite = false): DataResponse {
     });
 
     // ensure there are defaults left to add
-    if (defaults.length === 0) return { success: false, message: `No Names provided have available configs. Use network:create to make one.` }
+    if (defaults.length === 0) return { success: false, message: 'No Names provided have available configs. Use network:create to make one.' }
 
     // remove any duplicate domains
     defaults = [...new Set(defaults)];
@@ -195,7 +197,7 @@ function setDefaultNetwork(domains: string, overwrite = false): DataResponse {
     // send request and handle response
     const set = setVars(`${EVAR}=${newVal}`);
     if (set === {}) {
-        return { success: false, message: `Unable to set default network(s)` };
+        return { success: false, message: 'Unable to set default network(s)' };
     }
     return { success: true, message: `Set default network(s) to ${set[EVAR]}` + msg };
 }
@@ -213,7 +215,7 @@ function getDefaultNetwork(): DataResponse {
     if (typeof rvar === 'undefined' || rvar === '') {
         return {
             success: false,
-            message: `No Network defaults found`,
+            message: 'No Network defaults found',
             data: [],
         }
     }
@@ -221,7 +223,7 @@ function getDefaultNetwork(): DataResponse {
     // parse list and return
     return {
         success: true,
-        message: `Network defaults found`,
+        message: 'Network defaults found',
         data: rvar.split(':'),
     }
 }

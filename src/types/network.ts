@@ -1,11 +1,10 @@
-import {Record, String, Boolean, Literal, Union, Array as ArrayType} from 'runtypes';
+import {Record, String, Array as ArrayType} from 'runtypes';
 import {DID, KID, Url} from './base-types';
 
 /** Service Endpoint */
 const ServiceEndpoint = Record({
     url: Url,
 })
-
 
 /** Network Configuration for Content and Services */
 const NetworkConfig = Record({

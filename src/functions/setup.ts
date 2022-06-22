@@ -16,12 +16,12 @@ const inquirer = require('inquirer');
 // Set some constants used by multiple functions
 const idChoices = [
     'Create a new Identity',
-    'Add a pre-existing Identity'
+    'Add a pre-existing Identity',
 ];
 
 const keyImportChoices = [
     'Create a new key',
-    'Import a pre-existing key'
+    'Import a pre-existing key',
 ];
 
 const defaultTwitterToken = 'AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA';
@@ -38,30 +38,30 @@ async function promptIdentitySetup(): Promise<DataResponse> {
         name: 'idImport',
         message: 'Do you want to create a new Identity or add a pre-existing one?',
         choices: idChoices,
-        default: 0
+        default: 0,
     });
 
     let idSetup = {...addId};
     switch (addId.idImport) {
         // add identity option
-        case idChoices[1]:
+        case idChoices[1]: {
             const didPrompt = await inquirer.prompt([
                 {
                     type: 'input',
                     name: 'did',
-                    message: 'What is the DID string of the identity you are adding? Expected format: did:psqr:{hostname}/{path}'
+                    message: 'What is the DID string of the identity you are adding? Expected format: did:psqr:{hostname}/{path}',
                 },
                 {
                     type: 'list',
                     name: 'keyImport',
                     message: 'Do you want to create a new key and add it to this Identity or import a pre-existing key?',
                     choices: keyImportChoices,
-                    default: 0
-                }
+                    default: 0,
+                },
             ]);
             idSetup = {
                 ...idSetup,
-                ...didPrompt
+                ...didPrompt,
             };
 
             // verify that the did supplied is valid
@@ -78,53 +78,55 @@ async function promptIdentitySetup(): Promise<DataResponse> {
                 keyQuery.push({
                     type: 'input',
                     name: 'keyName',
-                    message: 'What is the name of the key you wish to create and add to this Identity (usually admin, publish, list, or curate)?'
+                    message: 'What is the name of the key you wish to create and add to this Identity (usually admin, publish, list, or curate)?',
                 });
             } else {
                 keyQuery.push({
                     type: 'input',
                     name: 'keyPath',
-                    message: 'What is the relative path to the key pair you wish to use from this Identity? Expected files are private.jwk and public.jwk.'
+                    message: 'What is the relative path to the key pair you wish to use from this Identity? Expected files are private.jwk and public.jwk.',
                 })
             }
             const keyPrompt = await inquirer.prompt(keyQuery);
             idSetup = {
                 ...idSetup,
-                ...keyPrompt
+                ...keyPrompt,
             };
             break;
+        }
         // create identity option
         case idChoices[0]:
-        default:
+        default: {
             const newDidPrompt = await inquirer.prompt([
                 {
                     type: 'input',
                     name: 'did',
-                    message: 'What is the DID string of the Identity you are creating?'
+                    message: 'What is the DID string of the Identity you are creating?',
                 },
                 {
                     type: 'input',
                     name: 'idName',
-                    message: 'What is the Full Name for the Identity you are creating?'
+                    message: 'What is the Full Name for the Identity you are creating?',
                 },
                 {
                     type: 'input',
                     name: 'keyNames',
                     message: 'What are the comma separated names of the keys you want to be created along with this Identity (usually admin, publish, list, or curate)?',
-                    default: 'admin'
-                }
+                    default: 'admin',
+                },
             ]);
             idSetup = {
                 ...idSetup,
-                ...newDidPrompt
+                ...newDidPrompt,
             }
             break;
+        }
     }
 
     return {
         success: true,
         message: 'Successfully retrieved all required identity info',
-        data: idSetup
+        data: idSetup,
     }
 }
 
@@ -137,22 +139,22 @@ async function promptIdentitySetup(): Promise<DataResponse> {
  */
 async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<IdentityResponse> {
     // determine user readable description of setup
-    let idDesc = `\nThis will ${ idSetup.idImport } with a DID of ${ idSetup.did }`;
+    let idDesc = `\nThis will ${idSetup.idImport} with a DID of ${idSetup.did}`;
     switch (idSetup.idImport) {
         // add identity option
         case idChoices[1]:
-            idDesc += `.\n`;
+            idDesc += '.\n';
             if (idSetup.keyImport === keyImportChoices[0]) {
-                idDesc += `It will create a key for this Identity called ${ idSetup.keyName }.\n`;
+                idDesc += `It will create a key for this Identity called ${idSetup.keyName}.\n`;
             } else {
-                idDesc += `It will import a key for this Identity located at ${ idSetup.keyPath }.\n`;
+                idDesc += `It will import a key for this Identity located at ${idSetup.keyPath}.\n`;
             }
             break;
         // create identity option
         case idChoices[0]:
         default:
-            idDesc += ` and a Full Name of ${ idSetup.idName }.\n`;
-            idDesc += `It will create keys for this Identity with the names ${ idSetup.keyNames }.\n`;
+            idDesc += ` and a Full Name of ${idSetup.idName}.\n`;
+            idDesc += `It will create keys for this Identity with the names ${idSetup.keyNames}.\n`;
             break;
     }
     console.log(idDesc);
@@ -162,12 +164,12 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
         type: 'confirm',
         name: 'confirm',
         message: 'Do you want to setup your identity as described?',
-        default: true
+        default: true,
     });
     if (confirmation.confirm === false) {
         return {
             success: false,
-            message: 'User cancelled Identity setup'
+            message: 'User cancelled Identity setup',
         }
     }
 
@@ -179,13 +181,13 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
     let identity: Static<typeof Identity>;
     switch (idSetup.idImport) {
         // add identity option
-        case idChoices[1]:
+        case idChoices[1]: {
             const dResp = await getDid(idSetup.did);
             if (dResp.success === false) {
                 const msg = handleRuntypeFail(dResp.error);
                 return {
                     success: false,
-                    message: msg
+                    message: msg,
                 };
             }
             const didDoc = dResp.didDoc;
@@ -212,7 +214,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
                 const pubPath = idSetup.keyPath + '/public.jwk';
                 const failureResp: IdentityResponse = {
                     success: false,
-                    message: 'Unable to find keys at ' + idSetup.keyPath
+                    message: 'Unable to find keys at ' + idSetup.keyPath,
                 };
                 const kf: FileConfig[] = [
                     {
@@ -228,7 +230,8 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
                 if (kfResp.success === false) return failureResp;
 
                 // separate out key files
-                let privKey, pubKey;
+                let privKey;
+                let pubKey;
                 for (let i = 0; i < kfResp.files.length; i++) {
                     const f = kfResp.files[i];
 
@@ -256,7 +259,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
                     const msg = handleRuntypeFail(error);
                     return {
                         success: false,
-                        message: msg
+                        message: msg,
                     };
                 }
 
@@ -265,16 +268,17 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
                 if (fkResp.success === false) {
                     return {
                         success: false,
-                        message: fkResp.message
+                        message: fkResp.message,
                     };
-                };
+                }
 
                 identity = fkResp.identity;
             }
             break;
+        }
         // create identity option
         case idChoices[0]:
-        default:
+        default: {
             let keyNames: string[] = [];
             if (idSetup.keyNames !== '' && idSetup.keyNames.split(',').length > 0) {
                 keyNames = idSetup.keyNames.replace(/\s/g, '').split(',');
@@ -291,7 +295,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
                 oraOutput.fail(msg);
                 return {
                     success: false,
-                    message: msg
+                    message: msg,
                 };
             }
 
@@ -301,6 +305,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
             // save created identity
             identity = newIdResp.identity;
             break;
+        }
     }
 
     // store full identity
@@ -308,7 +313,7 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
     if (addResp.success === false) {
         return {
             success: false,
-            message: addResp.message
+            message: addResp.message,
         };
     }
 
@@ -318,13 +323,13 @@ async function persistIdentitySetup(idSetup: any, oraOutput: any): Promise<Ident
     if (defResp.success === false) {
         return {
             success: false,
-            message: defResp.message
+            message: defResp.message,
         };
     }
 
     const idResp: IdentityResponse = {
         ...addResp,
-        identity: identity
+        identity: identity,
     }
 
     return idResp;
@@ -341,13 +346,13 @@ async function promptNetworkSetup(): Promise<any> {
         {
             type: 'input',
             name: 'domain',
-            message: 'What is the domain of the network you wish to add?'
+            message: 'What is the domain of the network you wish to add?',
         },
         {
             type: 'input',
             name: 'name',
-            message: 'What is the user friendly name of the network you wish to add?'
-        }
+            message: 'What is the user friendly name of the network you wish to add?',
+        },
     ]);
 
     const apiDefault = `https://${networkPrompt['domain']}/api`;
@@ -356,8 +361,8 @@ async function promptNetworkSetup(): Promise<any> {
             type: 'input',
             name: 'api',
             message: 'What is the full url for the api endpoint of the network you wish to add?',
-            default: apiDefault
-        }
+            default: apiDefault,
+        },
     ]);
 
     const iDomainDefault = `did:psqr:${networkPrompt['domain']}`;
@@ -366,14 +371,14 @@ async function promptNetworkSetup(): Promise<any> {
             type: 'input',
             name: 'domains',
             message: 'What is the comma separated list of identityDomains that this network manages for DID updates?',
-            default: iDomainDefault
-        }
+            default: iDomainDefault,
+        },
     ]);
 
     return {
         ...networkPrompt,
         ...apiPrompt,
-        identityDomains: iDomainPrompt.domains.replace(/\s/g, '').split(',')
+        identityDomains: iDomainPrompt.domains.replace(/\s/g, '').split(','),
     }
 }
 
@@ -394,40 +399,40 @@ async function persistNetworkSetup(netSetup: any, oraOutput: any, force = false)
             domain: netSetup['domain'],
             identityDomains: netSetup['identityDomains'],
             content: {
-                search:  {
-                    url: `https://search.${netSetup['domain']}`
+                search: {
+                    url: `https://search.${netSetup['domain']}`,
                 },
-                list:   {
-                    url: `https://list.${netSetup['domain']}`
+                list: {
+                    url: `https://list.${netSetup['domain']}`,
                 },
-                feed:   {
-                    url: `https://feed.${netSetup['domain']}`
+                feed: {
+                    url: `https://feed.${netSetup['domain']}`,
                 },
-                link:   {
-                    url: `https://link.${netSetup['domain']}`
+                link: {
+                    url: `https://link.${netSetup['domain']}`,
                 },
-                beacon:   {
-                    url: `https://beacon.${netSetup['domain']}`
-                }
+                beacon: {
+                    url: `https://beacon.${netSetup['domain']}`,
+                },
             },
             services: {
-                api:   {
+                api: {
                     url: netSetup['api'],
-                }
-            }
+                },
+            },
         })
     } catch (error: any) {
-        const msg = 'Failed to assemble network config because: ' +handleRuntypeFail(error);
+        const msg = 'Failed to assemble network config because: ' + handleRuntypeFail(error);
         if (force === false) oraOutput.fail(msg);
 
         return {
             success: false,
-            message: msg
+            message: msg,
         }
     }
 
     // determine user readable description of setup
-    let networkDesc = `\nThis will add the network config: \n${JSON.stringify(config, null, 4)}\n`;
+    const networkDesc = `\nThis will add the network config: \n${JSON.stringify(config, null, 4)}\n`;
     if (force === false) console.log(networkDesc);
 
     // confirm user choice
@@ -436,12 +441,12 @@ async function persistNetworkSetup(netSetup: any, oraOutput: any, force = false)
             type: 'confirm',
             name: 'confirm',
             message: 'Do you want to add the network config as described?',
-            default: true
+            default: true,
         });
         if (confirmation.confirm === false) {
             return {
                 success: false,
-                message: 'User cancelled Network setup'
+                message: 'User cancelled Network setup',
             }
         }
     }
@@ -464,7 +469,7 @@ async function persistNetworkSetup(netSetup: any, oraOutput: any, force = false)
 
     return {
         success: true,
-        message: 'Successfully added the Network Config'
+        message: 'Successfully added the Network Config',
     }
 }
 
@@ -479,23 +484,23 @@ async function promptProxySetup(): Promise<any> {
         {
             type: 'input',
             name: 'PROXY_HOST',
-            message: 'What is the domain or host of the proxy you wish to use?'
+            message: 'What is the domain or host of the proxy you wish to use?',
         },
         {
             type: 'input',
             name: 'PROXY_PORT',
-            message: 'What is the port of the proxy you wish to use?'
+            message: 'What is the port of the proxy you wish to use?',
         },
         {
             type: 'input',
             name: 'PROXY_USER',
-            message: 'What is the account username of the proxy you wish to use?'
+            message: 'What is the account username of the proxy you wish to use?',
         },
         {
             type: 'input',
             name: 'PROXY_PASS',
-            message: 'What is the account password of the proxy you wish to use?'
-        }
+            message: 'What is the account password of the proxy you wish to use?',
+        },
     ]);
 
     return proxyPrompt;
@@ -509,7 +514,7 @@ async function promptProxySetup(): Promise<any> {
  */
 async function persistProxySetup(proxySetup: any): Promise<DataResponse> {
     // determine user readable description of setup
-    let proxyDesc = `\nThis will save the proxy variables: \n${JSON.stringify(proxySetup, null, 4)}\n`;
+    const proxyDesc = `\nThis will save the proxy variables: \n${JSON.stringify(proxySetup, null, 4)}\n`;
     console.log(proxyDesc);
 
     // confirm user choice
@@ -517,12 +522,12 @@ async function persistProxySetup(proxySetup: any): Promise<DataResponse> {
         type: 'confirm',
         name: 'confirm',
         message: 'Do you want to setup your proxy as described?',
-        default: true
+        default: true,
     });
     if (confirmation.confirm === false) {
         return {
             success: false,
-            message: 'User cancelled Proxy setup'
+            message: 'User cancelled Proxy setup',
         }
     }
 
@@ -545,14 +550,14 @@ async function persistProxySetup(proxySetup: any): Promise<DataResponse> {
         if (Object.prototype.hasOwnProperty.call(proxySave, key) === false) {
             return {
                 success: false,
-                message: 'Some of the Proxy variables were not set correctly'
+                message: 'Some of the Proxy variables were not set correctly',
             }
         }
     }
 
     return {
         success: true,
-        message: 'Successfully setup Proxy'
+        message: 'Successfully setup Proxy',
     }
 }
 
@@ -565,9 +570,9 @@ async function persistProxySetup(proxySetup: any): Promise<DataResponse> {
  */
 async function promptCrawlSetup(identity: Static<typeof Identity>): Promise<any[]> {
     let continueSetup = false;
-    let webhosePrompted = false;
-    let twitterPrompted = false;
-    let results = []
+    const webhosePrompted = false;
+    const twitterPrompted = false;
+    const results = []
     do {
         // determine crawl to be added
         const kids = identity.keyPairs.map(p => p.kid);
@@ -577,15 +582,15 @@ async function promptCrawlSetup(identity: Static<typeof Identity>): Promise<any[
                 name: 'crawlType',
                 message: 'What is the type of the crawl config you want to add?',
                 choices: crawlTypes,
-                default: 0
+                default: 0,
             },
             {
                 type: 'list',
                 name: 'kid',
                 message: 'Which KID do you want to use with this crawl?',
                 choices: kids,
-                default: 0
-            }
+                default: 0,
+            },
         ]);
 
         const type: CrawlType = typePrompt.crawlType;
@@ -598,91 +603,94 @@ async function promptCrawlSetup(identity: Static<typeof Identity>): Promise<any[
                     type: 'input',
                     name: 'token',
                     message: 'What is the token for the twitter api?',
-                    default: defaultTwitterToken
+                    default: defaultTwitterToken,
                 }
             );
             result = {
                 ...result,
-                ...twitterToken
+                ...twitterToken,
             }
         } else if (type === 'webhose' && webhosePrompted === false) {
             const webhoseToken = await inquirer.prompt(
                 {
                     type: 'input',
                     name: 'token',
-                    message: 'What is the token for your webhose account?'
+                    message: 'What is the token for your webhose account?',
                 }
             );
             result = {
                 ...result,
-                ...webhoseToken
+                ...webhoseToken,
             }
         }
 
         // get type specific values
         switch (type) {
-            case 'rss':
+            case 'rss': {
                 const rssPrompt = await inquirer.prompt([
                     {
                         type: 'input',
                         name: 'url',
-                        message: 'What is the URL of the RSS feed you want to crawl?'
-                    }
+                        message: 'What is the URL of the RSS feed you want to crawl?',
+                    },
                 ]);
 
                 result = {
                     ...result,
-                    ...rssPrompt
+                    ...rssPrompt,
                 };
                 break;
-            case 'sitemap':
+            }
+            case 'sitemap': {
                 const sitemapPrompt = await inquirer.prompt([
                     {
                         type: 'input',
                         name: 'url',
-                        message: 'What is the URL of the website sitemap you want to crawl?'
-                    }
+                        message: 'What is the URL of the website sitemap you want to crawl?',
+                    },
                 ]);
 
                 result = {
                     ...result,
-                    ...sitemapPrompt
+                    ...sitemapPrompt,
                 };
                 break;
-            case 'twitter':
+            }
+            case 'twitter': {
                 const twitterPrompt = await inquirer.prompt([
                     {
                         type: 'input',
                         name: 'username',
-                        message: 'What is the username of the twitter profile you want to crawl?'
-                    }
+                        message: 'What is the username of the twitter profile you want to crawl?',
+                    },
                 ]);
-
 
                 result = {
                     ...result,
-                    ...twitterPrompt
+                    ...twitterPrompt,
                 };
                 break;
-            case 'webhose':
+            }
+            case 'webhose': {
                 const webhosePrompt = await inquirer.prompt([
                     {
                         type: 'input',
                         name: 'username',
-                        message: 'What is the username of your webhose account?'
+                        message: 'What is the username of your webhose account?',
                     },
                     {
                         type: 'input',
                         name: 'url',
-                        message: 'What is the URL of the website you want to crawl with webhose?'
-                    }
+                        message: 'What is the URL of the website you want to crawl with webhose?',
+                    },
                 ]);
 
                 result = {
                     ...result,
-                    ...webhosePrompt
+                    ...webhosePrompt,
                 };
                 break;
+            }
             default:
                 return [];
         }
@@ -694,7 +702,7 @@ async function promptCrawlSetup(identity: Static<typeof Identity>): Promise<any[
             type: 'confirm',
             name: 'confirm',
             message: 'Do you want to add another crawl config?',
-            default: false
+            default: false,
         });
 
         continueSetup = confirmation.confirm;
@@ -713,7 +721,7 @@ async function promptCrawlSetup(identity: Static<typeof Identity>): Promise<any[
  */
 async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<DataResponse> {
     // determine user readable description of setup
-    let crawlDesc = `\nThis will add the following crawl configs: \n${JSON.stringify(crawlSetup, null, 4)}\n`;
+    const crawlDesc = `\nThis will add the following crawl configs: \n${JSON.stringify(crawlSetup, null, 4)}\n`;
     console.log(crawlDesc);
 
     // confirm user choice
@@ -721,12 +729,12 @@ async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<Dat
         type: 'confirm',
         name: 'confirm',
         message: 'Do you want to add the crawl configs as described?',
-        default: true
+        default: true,
     });
     if (confirmation.confirm === false) {
         return {
             success: false,
-            message: 'User cancelled Crawl setup'
+            message: 'User cancelled Crawl setup',
         }
     }
 
@@ -741,18 +749,18 @@ async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<Dat
             type: configParams.crawlType,
             kid: configParams.kid,
             defaults: {},
-            lastPost: ''
+            lastPost: '',
         };
 
         const type: CrawlType = configParams.crawlType;
         oraOutput.start(`Saving ${type} crawl config...`);
 
         switch (type) {
-            case 'rss':
+            case 'rss': {
                 const rssConfig: Static<typeof RSS> = {
                     ...configBase,
                     url: configParams.url,
-                    etag: ''
+                    etag: '',
                 }
 
                 // store crawl config
@@ -763,11 +771,12 @@ async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<Dat
                 const rssDef = setDefaultCrawl('rss', did);
                 if (rssDef.success === false) return rssDef;
                 break;
-            case 'sitemap':
+            }
+            case 'sitemap': {
                 const sitemapConfig: Static<typeof Sitemap> = {
                     ...configBase,
                     url: configParams.url,
-                    since: '1d'
+                    since: '1d',
                 }
 
                 // store crawl config
@@ -778,7 +787,8 @@ async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<Dat
                 const sitemapDef = setDefaultCrawl('sitemap', did);
                 if (sitemapDef.success === false) return sitemapDef;
                 break;
-            case 'twitter':
+            }
+            case 'twitter': {
                 // if token is included, save it as an env var
                 if (typeof configParams.token === 'string') {
                     setVars(`TWITTER_TOKEN=${configParams.token}`, false);
@@ -788,7 +798,7 @@ async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<Dat
                     ...configBase,
                     userId: 0,
                     username: configParams.username,
-                    lastTweet: ''
+                    lastTweet: '',
                 }
 
                 // store crawl config
@@ -799,7 +809,8 @@ async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<Dat
                 const twitterDef = setDefaultCrawl('twitter', did);
                 if (twitterDef.success === false) return twitterDef;
                 break;
-            case 'webhose':
+            }
+            case 'webhose': {
                 // if token is included, save it as an env var
                 if (typeof configParams.token === 'string') {
                     setVars(`WEBHOSE_TOKEN=${configParams.token}`, false);
@@ -807,7 +818,7 @@ async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<Dat
 
                 const webhoseConfig: Static<typeof Webhose> = {
                     ...configBase,
-                    url: configParams.url
+                    url: configParams.url,
                 }
 
                 // store crawl config
@@ -818,18 +829,20 @@ async function persistCrawlSetup(crawlSetup: any[], oraOutput: any): Promise<Dat
                 const webhoseDef = setDefaultCrawl('webhose', did);
                 if (webhoseDef.success === false) return webhoseDef;
                 break;
-            default:
+            }
+            default: {
                 const msg = `Unsupported crawl config type ${type}`;
                 return {
                     success: false,
-                    message: msg
+                    message: msg,
                 }
+            }
         }
     }
 
     return {
         success: true,
-        message: 'Successfully persisted crawl configs'
+        message: 'Successfully persisted crawl configs',
     }
 }
 

@@ -2,9 +2,9 @@ import { importJWK, CompactSign } from 'jose';
 
 import { Static } from 'runtypes';
 
-import { generateInfoHash, parseKidKey, parseDidType } from './identity';
+import { generateInfoHash, parseKidKey } from './identity';
 import { Post, JwsPost, PostSkeleton } from '../types/post';
-import { Did, Identity, PublicInfo } from '../types/identity';
+import { Did, Identity } from '../types/identity';
 import { BroadcastConfig, DataResponse, ListResponse } from '../types/interfaces'
 import { concurrentPromises, handleRuntypeFail } from './utility';
 import { getNetworkConfig } from './network';
@@ -33,7 +33,7 @@ export interface JWSResponse extends DataResponse {
 }
 
 interface PublishRequestConfig extends AxiosRequestConfig {
-    id: string;
+    id?: string;
 }
 
 interface PublishResponse extends AxiosResponse {
@@ -415,7 +415,6 @@ async function putPost(jwsPost: Static<typeof JwsPost>, config: PutConfig, lgr: 
                 }
             }
 
-            // @ts-ignore: response contains id
             const resp: PublishResponse = v.value;
             return {
                 success: true,
@@ -460,7 +459,7 @@ function filterPostValues(skeleton: Static<typeof PostSkeleton>, filters: Static
     for (key in filters) {
         if (Object.prototype.hasOwnProperty.call(filters, key)) {
             const list = filters[key];
-            if (typeof list == 'undefined') continue;
+            if (typeof list === 'undefined') continue;
 
             for (let i = 0; i < list.length; i++) {
                 const filterValue = list[i];

@@ -54,7 +54,7 @@ async function exportPsqrConfig(options: ExportOptions): Promise<DataResponse> {
             identity: identity,
             network: {
                 config: netConfig,
-                permissions: []
+                permissions: [],
             },
         });
 

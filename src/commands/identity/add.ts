@@ -1,8 +1,9 @@
 import { Command, flags, run as runCommand } from '@oclif/command'
 import { Static } from 'runtypes';
 
-import { addExistingKeyPair, addIdentity, addNewKeyPair, getDid, parseBareDid, parseKidKey } from '../../functions/identity';
+import { addExistingKeyPair, addIdentity, addNewKeyPair, getDid } from '../../functions/identity';
 import { FileConfig, handleRuntypeFail, retrieveFiles } from '../../functions/utility';
+import { DID } from '../../types/base-types';
 import { Identity, KeyPair } from '../../types/identity';
 
 const getStdin = require('get-stdin');
@@ -12,14 +13,17 @@ const ora = require('ora');
  * Adds a preexisting identity to the CLI Configuration and creates a new Key.
  */
 export default class IdentityAdd extends Command {
-    static description = `Add a preexisting identity to the cli config and create a new key.
-This assumes the DID is located at the url specified in the KID url string.
+    static description = `Add a preexisting identity to the cli config.
+This assumes the DID is located at the url specified in the DID string.
+Create new keypair and add it to the DID doc with --key.
 If you have some pre-existing keys that you want to add you can either specify the path to them with --path,
 or pass the entire KeyPair as a JSON string with --stdin.
+Any changes to the DID doc (ie added keys) are local and most be propagated with identity:propagate.
 `
 
     static flags = {
         help: flags.help({ char: 'h' }),
+        key: flags.string({ char: 'k', description: 'Name of key to create and add to the DID doc.' }),
         stdin: flags.boolean({ char: 's', default: false, description: 'Use STDIN input as KeyPair. Expected JSON string format: { kid, private, public }' }),
         path: flags.string({ char: 'p', description: 'Instead of generating a new key, use the keys from this directory. Expected files are private.jwk and public.jwk' }),
         absolute: flags.boolean({ char: 'a', default: false, description: 'Key directory path is an absolute path' }),
@@ -27,8 +31,8 @@ or pass the entire KeyPair as a JSON string with --stdin.
 
     static args = [
         {
-            name: 'kid',
-            description: 'KID URL string, expected format: did:(psqr|web):{hostname}(/|:){path}#{keyId}',
+            name: 'did',
+            description: 'DID URL string, expected format: did:(psqr|web):{hostname}(/|:){path}',
         },
     ]
 
@@ -37,25 +41,26 @@ or pass the entire KeyPair as a JSON string with --stdin.
 
         const oraStart = ora('Preparing command...').start();
 
-        if (typeof args.kid === 'undefined') {
+        if (typeof args.did === 'undefined') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
             return runCommand(['identity:add', '-h']);
         }
 
-        const kid = args.kid;
+        // validate and assign kid
+        let did: Static<typeof DID>;
+        try {
+            did = DID.check(args.did);
+        } catch (error) {
+            oraStart.fail('Invalid DID string specified, expected format: did:(psqr|web):{hostname}(/|:){path}');
+            return false;
+        }
 
         oraStart.succeed('Command ready')
         const oraRun = ora('Adding Identity...').start();
 
-        // separate bare did and key name
-        const bdid = parseBareDid(kid);
-        if (bdid === false) return oraRun.fail('Unable to parse bare did from kid ' + kid);
-        const keyName = parseKidKey(kid);
-        if (keyName === false) return oraRun.fail('Unable to parse key name from kid ' + kid);
-
         // get identity object
-        const dResp = await getDid(bdid);
+        const dResp = await getDid(did);
         if (dResp.success === false) {
             const msg = handleRuntypeFail(dResp.error);
             return oraRun.fail(msg);
@@ -63,8 +68,9 @@ or pass the entire KeyPair as a JSON string with --stdin.
         const didDoc = dResp.didDoc;
 
         // start identity
+        let requireKeys = true;
         let identity: Static<typeof Identity> = {
-            did: bdid,
+            did: did,
             didDoc,
             keyPairs: [],
         }
@@ -108,7 +114,7 @@ or pass the entire KeyPair as a JSON string with --stdin.
                 let fileKeyPair: Static<typeof KeyPair>;
                 try {
                     fileKeyPair = KeyPair.check({
-                        kid,
+                        kid: JSON.parse(pubKey).kid,
                         private: JSON.parse(privKey),
                         public: JSON.parse(pubKey),
                     })
@@ -145,18 +151,23 @@ or pass the entire KeyPair as a JSON string with --stdin.
                 identity = skResp.identity;
                 break;
             }
-            default: {
-                // create a new key based on kid and add it to the identity
+            case (flags.key !== undefined): {
+                // create new keys based on specified names and add it to the identity
+                const kid = did + '#' + flags.key;
                 const nkResp = await addNewKeyPair(identity, kid);
                 if (nkResp.success === false) return oraRun.fail(nkResp.message);
 
                 identity = nkResp.identity;
                 break;
             }
+            default: {
+                requireKeys = false;
+                break;
+            }
         }
 
         // store full identity
-        const addResp = await addIdentity(identity);
+        const addResp = await addIdentity(identity, requireKeys);
 
         if (addResp.success) {
             oraRun.succeed(addResp.message)

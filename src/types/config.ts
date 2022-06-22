@@ -7,7 +7,7 @@ const PsqrConfig = Record({
     identity: Identity,
     network: Record({
         config: NetworkConfig,
-        permissions: ArrayType(NetworkPermissions)
+        permissions: ArrayType(NetworkPermissions),
     }),
 })
 

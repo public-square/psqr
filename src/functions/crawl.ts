@@ -142,6 +142,8 @@ async function getCrawlConfig(type: CrawlType, dids: string | boolean = false): 
             if (typeof f === 'object' && typeof f.data === 'string') {
                 return JSON.parse(f.data)
             }
+
+            return null;
         });
         return {
             success: true,
@@ -399,12 +401,14 @@ async function signCrawledPosts(config: CrawlConfig, store = true, posts: Static
             if (typeof f === 'object' && typeof f.data === 'string') {
                 return JSON.parse(f.data)
             }
+
+            return null;
         }));
     }
 
     // ensure there are some posts to sign
     if (posts.length === 0) {
-        const message = 'No posts found';
+        const message = 'No posts found to sign';
         lgr(message);
         return { success: false, message };
     }
@@ -978,7 +982,7 @@ async function getWebhosePosts(config: Static<typeof Webhose>, identity: Static<
                 }
             } else {
                 // get posts only and then sorted by publishDate
-                let processedValues = [];
+                const processedValues = [];
                 for (let k = 0; k < values.length; k++) {
                     const v = values[k];
 
@@ -1162,7 +1166,7 @@ async function getRSSPosts(config: Static<typeof RSS>, identity: Static<typeof I
     return Promise.allSettled(posts)
         .then(values => {
             // get posts only and then sorted by publishDate
-            let processedValues = [];
+            const processedValues = [];
             for (let k = 0; k < values.length; k++) {
                 const v = values[k];
 
@@ -1513,9 +1517,21 @@ async function getSitemapPosts(config: Static<typeof Sitemap>, identity: Static<
     let posts: DataResponse[] = [];
     const history = await getCrawlHistory(config.kid, false);
     try {
-        const { sites } = await crawlMaps.fetch();
+        const { sites, errors } = await crawlMaps.fetch();
+
+        if (errors.length > 0) {
+            const message = `Encountered ${errors.length} errors:`
+            lgr(message);
+            for (let k = 0; k < errors.length; k++) {
+                const err = errors[k];
+                lgr(err);
+            }
+        }
+
         if (sites.length === 0) {
-            const message = 'No urls retrieved';
+            let message = 'No urls retrieved';
+            if (errors.length > 0) message += ' because of errors. Check the log.';
+
             lgr(message);
             return {
                 success: false,

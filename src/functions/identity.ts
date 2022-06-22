@@ -26,7 +26,7 @@ const webResolver = getWebResolver();
 const psqrResolver = getPsqrResolver();
 const didResolver = new Resolver({
     ...webResolver,
-    ...psqrResolver
+    ...psqrResolver,
 })
 
 const IDENTITY_PATH = `${homedir}/.config/psqr/identities`;
@@ -82,9 +82,10 @@ export type IdentityResponse = {
  * Validate an Identity.
  *
  * @param identity obj containing identity to use
+ * @param requireKeys should at least one valid key pair be required
  * @returns Success or Failure Message Response of identity validation including valid identity object
  */
-async function validateIdentity(identity: Static<typeof Identity>): Promise<IdentityResponse> {
+async function validateIdentity(identity: Static<typeof Identity>, requireKeys = true): Promise<IdentityResponse> {
     try {
         // validate identity object
         Identity.check(identity);
@@ -94,7 +95,7 @@ async function validateIdentity(identity: Static<typeof Identity>): Promise<Iden
         const didDoc = Did.check(identity.didDoc);
 
         // ensure we have some keys to work with at this point
-        if (keys.length === 0) {
+        if (keys.length === 0 && requireKeys) {
             return { success: false, message: 'No keys provided' }
         }
 
@@ -141,7 +142,7 @@ async function validateIdentity(identity: Static<typeof Identity>): Promise<Iden
         identity.keyPairs = keys;
         identity.didDoc = didDoc;
 
-        if (keys.length === 0) {
+        if (keys.length === 0 && requireKeys) {
             return {
                 success: false,
                 message: 'No valid keys provided',
@@ -217,14 +218,15 @@ async function createIdentity(kid: string, info: Static<typeof PublicInfo>, keyN
  * Save an identity to psqr configuration directory for use.
  *
  * @param identity obj containing identity to add
+ * @param requireKeys should at least one valid key pair be required
  * @returns Success or Failure Message Response
  */
-async function addIdentity(identity: Static<typeof Identity>): Promise<DataResponse> {
+async function addIdentity(identity: Static<typeof Identity>, requireKeys = true): Promise<DataResponse> {
     // add a key if there are no provided keys
-    if (identity.keyPairs.length === 0) return { success: false, message: 'No keys provided' }
+    if (identity.keyPairs.length === 0 && requireKeys) return { success: false, message: 'No keys provided' }
 
     // validate identity
-    const valid = await validateIdentity(identity);
+    const valid = await validateIdentity(identity, requireKeys);
     if (valid.success === false) return valid;
 
     // extract elements of identity
@@ -356,7 +358,7 @@ async function getIdentity(kid = ''): Promise<IdentityResponse> {
         const didDoc = Did.check(dresp.didDoc);
 
         // get requested keys
-        let keyPairs: Static<typeof KeyPair>[] = [];
+        const keyPairs: Static<typeof KeyPair>[] = [];
         // verify there were keys requested
         const keyName = parseKidKey(kid);
         if (keyName !== false) {
@@ -488,7 +490,6 @@ async function getDid(did: string): Promise<DidResponse> {
     // ensure it is only the did string, no key names
     const bdid = parseBareDid(did);
     if (bdid === false) return didErr;
-    const didType = parseDidType(bdid);
 
     // set expected local did path
     const didPath = `${IDENTITY_PATH}/${bdid.replace(/:/g, '-')}/identity.json`;
@@ -504,7 +505,7 @@ async function getDid(did: string): Promise<DidResponse> {
             if (response.didDocument === null) {
                 return {
                     success: false,
-                    error: new Error(response.didResolutionMetadata.message)
+                    error: new Error(response.didResolutionMetadata.message),
                 }
             }
             const didDoc = Did.check(response.didDocument);
@@ -636,6 +637,8 @@ async function getAllKeyPairs(did: string): Promise<KeyPairsResponse> {
         if (typeof f === 'object' && typeof f.data === 'string') {
             return JSON.parse(f.data)
         }
+
+        return null;
     });
 
     // pair public and private keys
@@ -899,7 +902,7 @@ async function retrieveKeys(keyFiles: KeyFile[]): Promise<Static<typeof KeyPair>
 
                 // if public key wasn't found, parse it from the private key file
                 if (typeof pair.public === 'undefined') {
-                    let tempKey = JSON.parse(privateFile.data);
+                    const tempKey = JSON.parse(privateFile.data);
                     delete tempKey.d;
 
                     pair.public = PublicKey.check(tempKey);
@@ -987,15 +990,15 @@ function generateDID(did: string, keyPairs: Static<typeof KeyPair>[], info: Stat
         const didDoc: Static<typeof Did> = {
             '@context': [
                 'https://www.w3.org/ns/did/v1',
-                'https://vpsqr.com/ns/did-psqr/v1'
+                'https://vpsqr.com/ns/did-psqr/v1',
             ],
             id: did,
             psqr: {
                 publicIdentity: info,
                 publicKeys: [],
                 permissions: [],
-                updated: Date.now()
-            }
+                updated: Date.now(),
+            },
         };
 
         // iterate through each key pair and add public key
@@ -1207,7 +1210,7 @@ function parseDidUrl(did: string): Static<typeof Url> | false {
         }
         if (matches[1] === 'web') {
             // add did.json if web
-            path += `/did.json`;
+            path += '/did.json';
         }
 
         const url = Url.check(`https://${path}`);
@@ -1310,11 +1313,11 @@ async function getIdentityUpdateUrl(did: Static<typeof DID>): Promise<Static<typ
  * @returns success or failure message object from api endpoint
  */
 async function createIdentityAxiosClient(did: Static<typeof DID>, method: string, signature: string): Promise<DataResponse> {
-    let url = await getIdentityUpdateUrl(did);
+    const url = await getIdentityUpdateUrl(did);
     if (url === false) {
         return {
             success: false,
-            message: 'Unable to get url to update Identity with'
+            message: 'Unable to get url to update Identity with',
         }
     }
 
@@ -1347,5 +1350,5 @@ async function createIdentityAxiosClient(did: Static<typeof DID>, method: string
 export {
     getDid, getKeyPair, addNewKeyPair, addExistingKeyPair, retrieveKeys, generateKeys,
     validateIdentity, addIdentity, createIdentity, getIdentity, getDefaultIds, setDefaultIdentity, getFullIdentity,
-    refreshDid, generateInfoHash, parseDidUrl, parseBareDid, parseKidKey, parseDidType, verifyAdminIdentity, createIdentityAxiosClient
+    refreshDid, generateInfoHash, parseDidUrl, parseBareDid, parseKidKey, parseDidType, verifyAdminIdentity, createIdentityAxiosClient,
 };

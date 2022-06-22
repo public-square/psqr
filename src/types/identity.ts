@@ -1,5 +1,5 @@
 import { Record, Array as ArrayType, Number, String, Literal, Union } from 'runtypes';
-import { DID, DID_PSQR, DID_WEB, KID, Url } from './base-types';
+import { DID, KID, Url } from './base-types';
 
 /** Public Cryptographic Key */
 const PublicKey = Record({
@@ -17,7 +17,6 @@ const PrivateKey = PublicKey.And(
         d: String,
     })
 );
-
 
 /** Public Personal Information */
 const PublicInfo = Record({
@@ -43,8 +42,8 @@ const Did = Record({
             kid: KID,
             grant: ArrayType(String),
         })),
-        updated: Number.optional()
-    })
+        updated: Number.optional(),
+    }),
 })
 
 /** Key Pair - DID with Key, Private and Public Keys */
