@@ -5,7 +5,7 @@ import { getVars } from '../functions/env';
 import { handleRuntypeFail, retrieveFiles } from '../functions/utility';
 import { PostSkeleton } from '../types/post';
 import { generateLogInput, log } from '../functions/log';
-import { getIdentity } from '../functions/identity';
+import { getIdentity, getKeyPair } from '../functions/identity';
 
 const getStdin = require('get-stdin');
 const ora = require('ora');
@@ -87,6 +87,11 @@ export default class Post extends Command {
         if (idResp.success === false) return oraCreate.fail('Unable to get identity because: ' + idResp.message);
         const identity = idResp.identity;
 
+        // get keyPair object
+        const kpResp = await getKeyPair(kid);
+        if (kpResp.success === false) return oraCreate.fail('Unable to get KeyPair because ' + kpResp.message);
+        const keyPair = kpResp.keyPairs[0];
+
         // get body data, from file if needed
         let body = args.body;
         if (flags.raw === false && flags.stdin === false) {
@@ -128,7 +133,7 @@ export default class Post extends Command {
         const oraJWS = ora('Creating JWS...').start();
 
         const content = JSON.stringify(resp.data);
-        const respJWS = await post.createJWS(content, identity);
+        const respJWS = await post.createJWS(content, keyPair);
         if (respJWS.success === false || typeof respJWS.data === 'undefined') return oraCreate.fail(resp.message);
 
         const { jws, hash } = respJWS.data;

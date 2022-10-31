@@ -105,24 +105,26 @@ async function importPsqrConfig(config: Static<typeof PsqrConfig>, setDefault = 
         }
     }
 
-    // import network config
-    const netConfig = config.network.config;
-    // attempt to add network config
-    const netResp = createNetworkConfig(netConfig);
-    if (netResp.success === false) {
-        return {
-            success: false,
-            message: `Unable to add Network because: ${netResp.message}`,
-        }
-    }
-
-    // set network as default
-    if (setDefault) {
-        const defNetResp = setDefaultNetwork(netConfig.domain);
-        if (defNetResp.success === false) {
+    // import network config if present
+    if (typeof config.network !== 'undefined') {
+        const netConfig = config.network.config;
+        // attempt to add network config
+        const netResp = createNetworkConfig(netConfig);
+        if (netResp.success === false) {
             return {
                 success: false,
-                message: `Unable to set default Network because: ${defNetResp.message}`,
+                message: `Unable to add Network because: ${netResp.message}`,
+            }
+        }
+
+        // set network as default
+        if (setDefault) {
+            const defNetResp = setDefaultNetwork(netConfig.domain);
+            if (defNetResp.success === false) {
+                return {
+                    success: false,
+                    message: `Unable to set default Network because: ${defNetResp.message}`,
+                }
             }
         }
     }

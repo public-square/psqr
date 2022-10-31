@@ -33,7 +33,7 @@
 $ psqr COMMAND
 running command...
 $ psqr (-v|--version|version)
-psqr/0.1.3 linux-x64 node-v16.14.2
+psqr/0.1.4 linux-x64 node-v16.14.2
 $ psqr --help [COMMAND]
 USAGE
   $ psqr COMMAND
@@ -69,6 +69,7 @@ USAGE
 <li><a href="#psqr-identityupdate-did"><code>psqr identity:update [DID]</code></a></li>
 <li><a href="#psqr-identityvalidate-kid-path"><code>psqr identity:validate [KID] [PATH]</code></a></li>
 <li><a href="#psqr-keyadd-kid"><code>psqr key:add [KID]</code></a></li>
+<li><a href="#psqr-keyjws-data"><code>psqr key:jws [DATA]</code></a></li>
 <li><a href="#psqr-keynew-did-names"><code>psqr key:new [DID] [NAMES]</code></a></li>
 <li><a href="#psqr-network"><code>psqr network</code></a></li>
 <li><a href="#psqr-networkcreate-domain-name"><code>psqr network:create [DOMAIN] [NAME]</code></a></li>
@@ -90,10 +91,14 @@ ARGUMENTS
   DID  DID of the identity that you want to export
 
 OPTIONS
+  -e, --encode           encode the configuration so that it can be imported via the
+                         /config/settings-import?config=[encoded-string] path in the web app
+
   -h, --help             show CLI help
+
   -n, --network=network  domain of network to export instead of using default
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/config/export.ts">src/commands/config/export.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/config/export.ts">src/commands/config/export.ts</a></em></p>
 <h2 id="psqrconfigimportpath"><code>psqr config:import [PATH]</code></h2>
 <p>Import a config and set as default if specified</p>
 <pre><code>USAGE
@@ -107,7 +112,7 @@ OPTIONS
   -d, --key=key  Key name to use as default, if not specified the first available key will be used
   -h, --help     show CLI help
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/config/import.ts">src/commands/config/import.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/config/import.ts">src/commands/config/import.ts</a></em></p>
 <h2 id="psqrcrawltypedid"><code>psqr crawl [TYPE] [DID]</code></h2>
 <p>Crawl new Posts from feeds and publish them.</p>
 <pre><code>USAGE
@@ -132,7 +137,7 @@ DESCRIPTION
   Don't specify any arguments in order to use the defaults.
   If you want to crawl multiple configs use stdin or set them as the defaults.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/crawl.ts">src/commands/crawl.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/crawl.ts">src/commands/crawl.ts</a></em></p>
 <h2 id="psqrcrawladdrsskidurl"><code>psqr crawl:add:rss [KID] [URL]</code></h2>
 <p>Create a new RSS Crawl config</p>
 <pre><code>USAGE
@@ -149,7 +154,7 @@ OPTIONS
   -l, --lang=lang                                  Specify the default lang value
   -p, --politicalSubdivision=politicalSubdivision  Specify the default politicalSubdivision value
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/crawl/add/rss.ts">src/commands/crawl/add/rss.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/crawl/add/rss.ts">src/commands/crawl/add/rss.ts</a></em></p>
 <h2 id="psqrcrawladdsitemapkidurl"><code>psqr crawl:add:sitemap [KID] [URL]</code></h2>
 <p>Create or update a Sitemap crawl config</p>
 <pre><code>USAGE
@@ -187,7 +192,7 @@ OPTIONS
 
   -t, --filterTitle=filterTitle                    List of titles to never use divided by the pipe symbol (|).
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/crawl/add/sitemap.ts">src/commands/crawl/add/sitemap.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/crawl/add/sitemap.ts">src/commands/crawl/add/sitemap.ts</a></em></p>
 <h2 id="psqrcrawladdtwitterkidusername"><code>psqr crawl:add:twitter [KID] [USERNAME]</code></h2>
 <p>Create a new Twitter Crawl config</p>
 <pre><code>USAGE
@@ -204,7 +209,7 @@ OPTIONS
   -l, --lang=lang                                  Specify the default lang value
   -p, --politicalSubdivision=politicalSubdivision  Specify the default politicalSubdivision value
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/crawl/add/twitter.ts">src/commands/crawl/add/twitter.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/crawl/add/twitter.ts">src/commands/crawl/add/twitter.ts</a></em></p>
 <h2 id="psqrcrawladdwebhosekidusername"><code>psqr crawl:add:webhose [KID] [USERNAME]</code></h2>
 <p>Create a new Webhose Crawl config</p>
 <pre><code>USAGE
@@ -222,7 +227,7 @@ OPTIONS
   -l, --lang=lang                                  Specify the default lang value
   -p, --politicalSubdivision=politicalSubdivision  Specify the default politicalSubdivision value
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/crawl/add/webhose.ts">src/commands/crawl/add/webhose.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/crawl/add/webhose.ts">src/commands/crawl/add/webhose.ts</a></em></p>
 <h2 id="psqrcrawldefaulttypedid"><code>psqr crawl:default [TYPE] [DID]</code></h2>
 <p>Set the default Crawl(s)</p>
 <pre><code>USAGE
@@ -240,7 +245,7 @@ OPTIONS
 DESCRIPTION
   Default behavior is to add specified Crawl(s) to defaults.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/crawl/default.ts">src/commands/crawl/default.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/crawl/default.ts">src/commands/crawl/default.ts</a></em></p>
 <h2 id="psqrcrawlpublishtypedid"><code>psqr crawl:publish [TYPE] [DID]</code></h2>
 <p>Publish posts stored with a Crawler.</p>
 <pre><code>USAGE
@@ -264,7 +269,7 @@ DESCRIPTION
   All posts that are in the posts dir of the Crawler will be signed,
   published to the broadcasters, and then deleted unless otherwise specified.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/crawl/publish.ts">src/commands/crawl/publish.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/crawl/publish.ts">src/commands/crawl/publish.ts</a></em></p>
 <h2 id="psqrcrawlpulltypedid"><code>psqr crawl:pull [TYPE] [DID]</code></h2>
 <p>Crawl new Posts from feeds.</p>
 <pre><code>USAGE
@@ -286,7 +291,7 @@ DESCRIPTION
   New posts from all feeds are retrieved and stored in their feed directories
   or locally if specified.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/crawl/pull.ts">src/commands/crawl/pull.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/crawl/pull.ts">src/commands/crawl/pull.ts</a></em></p>
 <h2 id="psqrcrawlremovetypedid"><code>psqr crawl:remove [TYPE] [DID]</code></h2>
 <p>Remove Crawl configs.</p>
 <pre><code>USAGE
@@ -300,7 +305,7 @@ OPTIONS
   -h, --help   show CLI help
   -s, --stdin  Use STDIN input as a list of newline separated DIDs.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/crawl/remove.ts">src/commands/crawl/remove.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/crawl/remove.ts">src/commands/crawl/remove.ts</a></em></p>
 <h2 id="psqrcrawltesttypedid"><code>psqr crawl:test [TYPE] [DID]</code></h2>
 <p>Run a test Crawl to verify the information gathered is accurate.</p>
 <pre><code>USAGE
@@ -321,10 +326,10 @@ OPTIONS
 
 DESCRIPTION
   Output normally includes post.info.publicSquare.package only as json array.
-  Output is saved as a local file(s) with the name crawl-test-{ level }-{ path valid did}-{ timestamp }.json(l) 
+  Output is saved as a local file(s) with the name crawl-test-{ level }-{ path valid did}-{ timestamp }.json(l)
   depending on options selected.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/crawl/test.ts">src/commands/crawl/test.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/crawl/test.ts">src/commands/crawl/test.ts</a></em></p>
 <h2 id="psqrenvfile"><code>psqr env [FILE]</code></h2>
 <p>View or set psqr environment vars. If a valid env [FILE] is specified it will replace the current env and be saved.</p>
 <pre><code>USAGE
@@ -340,7 +345,7 @@ OPTIONS
   -p, --possible  List all possible env vars
   -s, --set=set   Set and save specific env vars. Format is comma separated key=value
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/env.ts">src/commands/env.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/env.ts">src/commands/env.ts</a></em></p>
 <h2 id="psqrhelpcommand"><code>psqr help [COMMAND]</code></h2>
 <p>display help for psqr</p>
 <pre><code>USAGE
@@ -370,7 +375,7 @@ OPTIONS
 DESCRIPTION
   This command lists the identities that are currently saved and available.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity.ts">src/commands/identity.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity.ts">src/commands/identity.ts</a></em></p>
 <h2 id="psqridentityadddid"><code>psqr identity:add [DID]</code></h2>
 <p>Add a preexisting identity to the cli config.</p>
 <pre><code>USAGE
@@ -396,7 +401,7 @@ DESCRIPTION
   or pass the entire KeyPair as a JSON string with --stdin.
   Any changes to the DID doc (ie added keys) are local and most be propagated with identity:propagate.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity/add.ts">src/commands/identity/add.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity/add.ts">src/commands/identity/add.ts</a></em></p>
 <h2 id="psqridentitycreatekid"><code>psqr identity:create [KID]</code></h2>
 <p>Create a new identity from a provided KID and add it to the psqr config.</p>
 <pre><code>USAGE
@@ -421,7 +426,7 @@ OPTIONS
 DESCRIPTION
   This only supports creating did:psqr identities.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity/create.ts">src/commands/identity/create.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity/create.ts">src/commands/identity/create.ts</a></em></p>
 <h2 id="psqridentitydefaultkid"><code>psqr identity:default [KID]</code></h2>
 <p>Set the default identity using the KID</p>
 <pre><code>USAGE
@@ -433,7 +438,7 @@ ARGUMENTS
 OPTIONS
   -h, --help  show CLI help
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity/default.ts">src/commands/identity/default.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity/default.ts">src/commands/identity/default.ts</a></em></p>
 <h2 id="psqridentitydeletedid"><code>psqr identity:delete [DID]</code></h2>
 <p>Remove an Identity from a Public Square Network that hosts Identities.</p>
 <pre><code>USAGE
@@ -445,7 +450,7 @@ ARGUMENTS
 OPTIONS
   -h, --help  show CLI help
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity/delete.ts">src/commands/identity/delete.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity/delete.ts">src/commands/identity/delete.ts</a></em></p>
 <h2 id="psqridentityexportdid"><code>psqr identity:export [DID]</code></h2>
 <p>Export the did doc of an identity.</p>
 <pre><code>USAGE
@@ -462,7 +467,7 @@ OPTIONS
 DESCRIPTION
   If you wish to export your stored private keys you need to specify each key by name.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity/export.ts">src/commands/identity/export.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity/export.ts">src/commands/identity/export.ts</a></em></p>
 <h2 id="psqridentitynewkid"><code>psqr identity:new [KID]</code></h2>
 <p>Create a new default identity</p>
 <pre><code>USAGE
@@ -486,7 +491,7 @@ DESCRIPTION
   adds it to the psqr config, and sets it as the default.
   This only supports creating did:psqr identities.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity/new.ts">src/commands/identity/new.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity/new.ts">src/commands/identity/new.ts</a></em></p>
 <h2 id="psqridentitypropagatedid"><code>psqr identity:propagate [DID]</code></h2>
 <p>Propagate an Identity to a Public Square Network that hosts Identities.</p>
 <pre><code>USAGE
@@ -501,7 +506,7 @@ OPTIONS
 DESCRIPTION
   It will use any available admin key associated with the identity or it will throw an error if none are available.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity/propagate.ts">src/commands/identity/propagate.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity/propagate.ts">src/commands/identity/propagate.ts</a></em></p>
 <h2 id="psqridentityresolvedid"><code>psqr identity:resolve [DID]</code></h2>
 <p>For Self Hosting the Identity, find the local file and the URL that must serve it.</p>
 <pre><code>USAGE
@@ -513,7 +518,7 @@ ARGUMENTS
 OPTIONS
   -h, --help  show CLI help
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity/resolve.ts">src/commands/identity/resolve.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity/resolve.ts">src/commands/identity/resolve.ts</a></em></p>
 <h2 id="psqridentityupdatedid"><code>psqr identity:update [DID]</code></h2>
 <p>Update a local Identity with specified info or from the hosted DID doc.</p>
 <pre><code>USAGE
@@ -539,7 +544,7 @@ DESCRIPTION
   This does not affect keys or permissions granted.
   Use the fetch flag to update the local doc.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity/update.ts">src/commands/identity/update.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity/update.ts">src/commands/identity/update.ts</a></em></p>
 <h2 id="psqridentityvalidatekidpath"><code>psqr identity:validate [KID] [PATH]</code></h2>
 <p>Validate an identity (DID doc and key pair)</p>
 <pre><code>USAGE
@@ -559,10 +564,10 @@ OPTIONS
 
 DESCRIPTION
   Use the import flag to import the key into the local identity as well.
-  If no key path is specified and no stdin input is provided then this will fallback to checking in the local directory 
+  If no key path is specified and no stdin input is provided then this will fallback to checking in the local directory
   of the identity.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/identity/validate.ts">src/commands/identity/validate.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/identity/validate.ts">src/commands/identity/validate.ts</a></em></p>
 <h2 id="psqrkeyaddkid"><code>psqr key:add [KID]</code></h2>
 <p>Add a preexisting Key to an identity stored in the cli config.</p>
 <pre><code>USAGE
@@ -581,7 +586,22 @@ DESCRIPTION
   Specify the path to the directory containing them with --path,
   or pass the entire KeyPair as a JSON string with --stdin.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/key/add.ts">src/commands/key/add.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/key/add.ts">src/commands/key/add.ts</a></em></p>
+<h2 id="psqrkeyjwsdata"><code>psqr key:jws [DATA]</code></h2>
+<p>Generate a JWS for an arbitrary string with specified key.</p>
+<pre><code>USAGE
+  $ psqr key:jws [DATA]
+
+ARGUMENTS
+  DATA  Relative path to file with string data
+
+OPTIONS
+  -h, --help     show CLI help
+  -k, --kid=kid  KID string
+  -r, --raw      DATA specified is raw (not a filepath), you need to escape "
+  -s, --stdin    Use STDIN input as DATA
+</code></pre>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/key/jws.ts">src/commands/key/jws.ts</a></em></p>
 <h2 id="psqrkeynewdidnames"><code>psqr key:new [DID] [NAMES]</code></h2>
 <p>Create new Keys and add them to a preexisting identity.</p>
 <pre><code>USAGE
@@ -594,7 +614,7 @@ ARGUMENTS
 OPTIONS
   -h, --help  show CLI help
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/key/new.ts">src/commands/key/new.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/key/new.ts">src/commands/key/new.ts</a></em></p>
 <h2 id="psqrnetwork"><code>psqr network</code></h2>
 <p>List Network config</p>
 <pre><code>USAGE
@@ -610,7 +630,7 @@ DESCRIPTION
   Lists the config of the Network(s) as specified by flags.
   Lists the defaults if not otherwise specified.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/network.ts">src/commands/network.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/network.ts">src/commands/network.ts</a></em></p>
 <h2 id="psqrnetworkcreatedomainname"><code>psqr network:create [DOMAIN] [NAME]</code></h2>
 <p>Create a new Network config</p>
 <pre><code>USAGE
@@ -637,7 +657,7 @@ OPTIONS
 
   -s, --search=search                    Url to use instead of search default (search.[domain])
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/network/create.ts">src/commands/network/create.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/network/create.ts">src/commands/network/create.ts</a></em></p>
 <h2 id="psqrnetworkdefaultdomains"><code>psqr network:default [DOMAINS]</code></h2>
 <p>Set the default Network(s)</p>
 <pre><code>USAGE
@@ -653,7 +673,7 @@ OPTIONS
 DESCRIPTION
   Default behavior is to add specified Network(s) to defaults.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/network/default.ts">src/commands/network/default.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/network/default.ts">src/commands/network/default.ts</a></em></p>
 <h2 id="psqrnetworkremovedomains"><code>psqr network:remove [DOMAINS]</code></h2>
 <p>Remove Network configs</p>
 <pre><code>USAGE
@@ -665,7 +685,7 @@ ARGUMENTS
 OPTIONS
   -h, --help  show CLI help
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/network/remove.ts">src/commands/network/remove.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/network/remove.ts">src/commands/network/remove.ts</a></em></p>
 <h2 id="psqrpostbody"><code>psqr post [BODY]</code></h2>
 <p>Create post, sign it with specified key, and publish to Broadcaster</p>
 <pre><code>USAGE
@@ -689,7 +709,7 @@ OPTIONS
   -s, --stdin                                      Use STDIN input as DATA
   -t, --title=title                                Post title
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/post.ts">src/commands/post.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/post.ts">src/commands/post.ts</a></em></p>
 <h2 id="psqrpostcreatebody"><code>psqr post:create [BODY]</code></h2>
 <p>Create Post JSON with input data</p>
 <pre><code>USAGE
@@ -712,7 +732,7 @@ OPTIONS
   -s, --stdin                                      Use STDIN input as DATA
   -t, --title=title                                Post title
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/post/create.ts">src/commands/post/create.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/post/create.ts">src/commands/post/create.ts</a></em></p>
 <h2 id="psqrpostputhashdata"><code>psqr post:put [HASH] [DATA]</code></h2>
 <p>Publish content to the specified Broadcaster</p>
 <pre><code>USAGE
@@ -732,7 +752,7 @@ OPTIONS
 
   -s, --stdin                      Use STDIN input as DATA
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/post/put.ts">src/commands/post/put.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/post/put.ts">src/commands/post/put.ts</a></em></p>
 <h2 id="psqrpostsigndata"><code>psqr post:sign [DATA]</code></h2>
 <p>Parse post JSON and sign it with specified key</p>
 <pre><code>USAGE
@@ -747,7 +767,7 @@ OPTIONS
   -r, --raw      DATA specified is raw (not a filepath), you need to escape "
   -s, --stdin    Use STDIN input as DATA
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/post/sign.ts">src/commands/post/sign.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/post/sign.ts">src/commands/post/sign.ts</a></em></p>
 <h2 id="psqrsearchquery"><code>psqr search [QUERY]</code></h2>
 <p>Search ElasticSearch for a specific string</p>
 <pre><code>USAGE
@@ -764,7 +784,7 @@ OPTIONS
   -p, --page=page          ElasticSearch page to query, defaults to 1
   -r, --raw                Output only the raw responses
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/search.ts">src/commands/search.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/search.ts">src/commands/search.ts</a></em></p>
 <h2 id="psqrsetup"><code>psqr setup</code></h2>
 <p>This utility will prompt you for the all of the necessary info to get your environment up and running.</p>
 <pre><code>USAGE
@@ -776,7 +796,7 @@ OPTIONS
 DESCRIPTION
   It will set up your identity, keys, necessary networking, and any content crawling configuration you may need.
 </code></pre>
-<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.3/src/commands/setup.ts">src/commands/setup.ts</a></em></p>
+<p><em>See code: <a href="https://github.com/public-square/psqr/blob/v0.1.4/src/commands/setup.ts">src/commands/setup.ts</a></em></p>
 <!-- commandsstop -->
     </section>
 

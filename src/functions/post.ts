@@ -4,7 +4,7 @@ import { Static } from 'runtypes';
 
 import { generateInfoHash, parseKidKey } from './identity';
 import { Post, JwsPost, PostSkeleton } from '../types/post';
-import { Did, Identity } from '../types/identity';
+import { Did, Identity, KeyPair } from '../types/identity';
 import { BroadcastConfig, DataResponse, ListResponse } from '../types/interfaces'
 import { concurrentPromises, handleRuntypeFail } from './utility';
 import { getNetworkConfig } from './network';
@@ -45,26 +45,25 @@ interface PublishResponse extends AxiosResponse {
  * Content param must be a complete JSON string containing data to be used.
  *
  * @param content JSON string to encrypt
- * @param identity obj containing identity to use
+ * @param keyPair obj containing keys to use
+ * @param postData bool if the provided string is a post
  * @returns Success or Failure Message Response and signed JWS string
  */
-async function createJWS(content: string, identity: Static<typeof Identity>): Promise<JWSResponse> {
+async function createJWS(content: string, keyPair: Static<typeof KeyPair>, postData = true): Promise<JWSResponse> {
     try {
-        // validate identity
-        Identity.check(identity);
-
-        // get keys from identity
-        const keyPair = identity.keyPairs[0];
-        if (keyPair === null) return { success: false, message: 'No keys available to use' };
+        // check keys
+        if (keyPair?.private === null) return { success: false, message: 'No keys available to use' };
 
         // get key from JWK and validate content as Post
+        let hash = '';
         const key = await importJWK(keyPair.private);
-        const contentObj = Post.check(JSON.parse(content));
-
-        const hash = contentObj.infoHash;
+        if (postData) {
+            const contentObj = Post.check(JSON.parse(content));
+            hash = contentObj.infoHash;
+        }
 
         // generate JWS token and include kid as header
-        const token = await new CompactSign(encoder.encode(JSON.stringify(contentObj)))
+        const token = await new CompactSign(encoder.encode(content))
             .setProtectedHeader({
                 alg: 'ES384',
                 kid: keyPair.kid,

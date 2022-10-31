@@ -288,7 +288,7 @@ function handleRuntypeFail(error: Error | any): string {
         msg = error.stack + '\n' + msg;
     }
 
-    switch (error) {
+    switch (true) {
         case typeof error.details !== 'undefined':
             msg += '\n' + JSON.stringify(error.details, null, 4);
             break;

@@ -21,7 +21,7 @@ const ora = require('ora');
  *      --title 'Post Title' \
  *      --geo 'newyork' \
  *      --politicalSubdivision 'US/New_York/Broome' \
- *      --image 'https://newpress.co/images/logo-dark-wide.png'
+ *      --image 'https://newpress.co/images/logo-dark-wide.png' \
  *      --canonicalUrl 'https://newpress.co/posts/hello'
  * ```
  */

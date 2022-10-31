@@ -9,10 +9,10 @@ const getStdin = require('get-stdin');
 const ora = require('ora');
 
 /**
- * Parses post JSON and signs it with specified key.
+ * Generates a JWS for an arbitrary string with specified key.
  */
-export default class PostSign extends Command {
-    static description = 'Parse post JSON and sign it with specified key'
+export default class KeyJws extends Command {
+    static description = 'Generate a JWS for an arbitrary string with specified key.'
 
     static flags = {
         help: flags.help({ char: 'h' }),
@@ -24,12 +24,12 @@ export default class PostSign extends Command {
     static args = [
         {
             name: 'data',
-            description: 'Relative path to post file or JSON post data',
+            description: 'Relative path to file with string data',
         },
     ]
 
     async run() {
-        const { args, flags } = this.parse(PostSign)
+        const { args, flags } = this.parse(KeyJws)
 
         const oraStart = ora('Preparing command...').start();
 
@@ -38,7 +38,7 @@ export default class PostSign extends Command {
         if (typeof args.data === 'undefined' || args.data === '') {
             // if you want to run another command it must be returned like so
             oraStart.fail('Insufficient arguments provided\n')
-            return runCommand(['post:sign', '-h']);
+            return runCommand(['key:jws', '-h']);
         }
 
         const env = getVars();
@@ -73,27 +73,27 @@ export default class PostSign extends Command {
             content = cResp.files[0].data;
         }
 
-        // sign post
-        const resp = await createJWS(content, keyPair);
+        // sign data to create JWS
+        const resp = await createJWS(content, keyPair, false);
         if (resp.success === false || typeof resp.data === 'undefined') {
             oraCreate.fail(resp.message);
             return false;
         }
 
-        const { jws, hash } = resp.data;
-        oraCreate.succeed(resp.message + '\nHash: ' + hash);
+        const { jws } = resp.data;
+        oraCreate.succeed(resp.message);
         const oraSave = ora('Saving JWS...').start();
 
         const jwsFile = await createFiles([
             {
-                path: hash?.slice(0, 6) + '.jws',
+                path: keyPair.kid.replace(/[:/]/g, '-') + '-' + Date.now() + '.jws',
                 relative: true,
-                data: JSON.stringify(jws),
+                data: jws.token,
             },
         ]);
 
         if (jwsFile.success) {
-            oraSave.succeed(`${jwsFile.message}\nGenerated post at: ${jwsFile.files[0]}`);
+            oraSave.succeed(`${jwsFile.message}\nGenerated JWS at: ${jwsFile.files[0]}`);
         } else {
             oraSave.fail(jwsFile.message);
         }

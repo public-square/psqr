@@ -10,7 +10,7 @@ import { handleRuntypeFail, retrieveFiles, deleteFiles, FileConfig, FileResponse
 import { Identity } from '../types/identity';
 import { Post, PostSkeleton } from '../types/post';
 import { createJWS, createPost, createUrlPost } from './post';
-import { getIdentity, parseBareDid } from './identity';
+import { getIdentity, getKeyPair, parseBareDid } from './identity';
 import { CrawlFilters } from '../types/base-types';
 
 const homedir = require('os').homedir();
@@ -370,15 +370,6 @@ async function signCrawledPosts(config: CrawlConfig, store = true, posts: Static
     const lgr = generateLogger(logFile);
     lgr('Signing crawled posts', true);
 
-    // get identity
-    const idResp = await getIdentity(config.kid);
-    if (idResp.success === false) {
-        const message = 'Unable to get identity because: ' + idResp.message;
-        lgr(message);
-        return { success: false, message };
-    }
-    const identity = idResp.identity;
-
     // if no posts have been passed, check post dir
     const dir = `${PATH}/posts`;
     if (posts.length === 0) {
@@ -413,9 +404,15 @@ async function signCrawledPosts(config: CrawlConfig, store = true, posts: Static
         return { success: false, message };
     }
 
+    // get keyPair object
+    const kid = config.kid || '';
+    const kpResp = await getKeyPair(kid);
+    if (kpResp.success === false) return { success: false, message: kpResp.message };
+    const keyPair = kpResp.keyPairs[0];
+
     // validate and sign files
     const jwsPromise: Promise<DataResponse>[] = [];
-    posts.forEach(p => jwsPromise.push(createJWS(JSON.stringify(p), identity)));
+    posts.forEach(p => jwsPromise.push(createJWS(JSON.stringify(p), keyPair)));
     const jwsResp = await Promise.all(jwsPromise);
 
     // log signing failures
@@ -1088,120 +1085,141 @@ async function getRSSPosts(config: Static<typeof RSS>, identity: Static<typeof I
         feedLinks.push(post.link);
     }
     const filteredUrls = await filterCrawlUrls(feedLinks, config.filters?.crawl, history, proxyConfig);
-    const filteredPosts = []
-    for (let j = 0; j < feed.items.length; j++) {
-        const post = feed.items[j];
-
-        // include post if it passed the filter
-        if (filteredUrls.indexOf(post.link) !== -1) {
-            filteredPosts.push(post);
-        }
-    }
-    feed.items = filteredPosts;
-    lgr(`${feed.items.length} RSS posts passed the filter`)
+    lgr(`${filteredUrls.length} RSS posts passed the filter`)
 
     // if requested return only urls (level 1)
     if (testLevel === 1) {
-        const posts: any[] = [];
         const testResp = {
             success: true,
             message: 'Retrieved urls',
             data: {
-                posts: posts,
+                posts: filteredUrls,
             },
         };
-
-        for (let i = 0; i < feed.items.length; i++) {
-            const post = feed.items[i];
-            testResp.data.posts.push(post.link);
-        }
 
         return testResp;
     }
 
-    // if requested return only source data (level 2)
-    if (testLevel === 2) {
-        const testResp = {
-            success: true,
-            message: 'Retrieved source data',
-            data: {
-                posts: feed.items,
-            },
-        };
+    let posts: DataResponse[] = [];
+    try {
+        // using filtered urls, create post requests limited to 100 concurrent and wait for them to return
+        const poolParams: any[] = [];
+        for (let i = 0; i < filteredUrls.length; i++) {
+            const u = filteredUrls[i];
 
-        return testResp
-    }
+            // return only ogs data if requested
+            if (testLevel === 2) {
+                let ogsData;
 
-    // iterate through feed items to make posts
-    const posts = [];
-    lgr(`Generating posts from ${feed.items.length} feed items`);
-    for (let i = 0; i < feed.items.length; i++) {
-        const item = feed.items[i];
+                // ogs
+                const options: any = {
+                    url: u,
+                    ogImageFallback: false,
+                    customMetaTags: [
+                        {
+                            multiple: false,
+                            property: 'article:published',
+                            fieldName: 'articlePublishedTime',
+                        },
+                        {
+                            multiple: false,
+                            property: 'article:modified',
+                            fieldName: 'articleModifiedTime',
+                        },
+                    ],
+                    timeout: 10000,
+                };
 
-        // assemble post skeleton
-        let skeleton;
-        try {
-            skeleton = PostSkeleton.check({
-                body: item['content:encoded'] || '',
-                description: item.contentSnippet || '',
-                lang: feed.language || config.defaults.lang || '',
-                publishDate: new Date(item.pubDate).getTime() || Date.now(),
-                title: item.title || '',
-                geo: config.defaults.geo || '',
-                politicalSubdivision: config.defaults.politicalSubdivision || '',
-                image: item.enclosure?.url || config.defaults.image || '',
-                canonicalUrl: item.link || '',
-            });
-        } catch (error: any) {
-            const msg = handleRuntypeFail(error);
-            return { success: false, message: msg }
+                // add proxy if necessary
+                if (proxyConfig !== false) {
+                    options.agent = new proxyAgent(proxyConfig);
+                }
+
+                try {
+                    ogsData = await ogs(options);
+                } catch (error: any) {
+                    console.error(error);
+                    continue;
+                }
+
+                const srcData = {
+                    success: true,
+                    message: 'Got source data',
+                    data: {
+                        url: u,
+                        ogsData: ogsData.result,
+                    },
+                };
+
+                posts.push(srcData);
+            } else {
+                poolParams.push([
+                    u,
+                    identity,
+                    config.filters?.value,
+                ])
+            }
         }
 
-        // generate post creation promise and add to list
-        const pp = createPost(skeleton, identity);
-        posts.push(pp);
+        if (testLevel !== 2) {
+            posts = await concurrentPromises(poolParams, createUrlPost, 10);
+        }
+    } catch (error: any) {
+        const msg = handleRuntypeFail(error);
+        return { success: false, message: msg }
     }
 
-    // once all promises are returned, return ordered list of posts
-    return Promise.allSettled(posts)
-        .then(values => {
-            // get posts only and then sorted by publishDate
-            const processedValues = [];
-            for (let k = 0; k < values.length; k++) {
-                const v = values[k];
+    // finalize post values
+    const finalPosts: any[] = [];
 
-                if (v.status === 'fulfilled') {
-                    processedValues.push(v.value.data)
-                }
+    // get sucessful posts only
+    lgr(`Validating ${posts.length} posts and updating rss history`);
+    for (let j = 0; j < posts.length; j++) {
+        const resp = posts[j];
+
+        if (resp.success) {
+            // skip filtering if test level 2
+            if (testLevel === 2) {
+                finalPosts.push(resp.data);
+                continue;
             }
-            const posts = processedValues.sort((a, b) => {
-                if (a.info.publicSquare.package.publishDate > b.info.publicSquare.package.publishDate) {
-                    return 1 // use b first
-                }
-                return -1 // use a first
-            });
 
-            // update history if not testing
-            if (testLevel === 0) {
-                for (let j = 0; j < posts.length; j++) {
-                    const post = posts[j];
+            const postData = resp.data;
+            const post = postData.post;
 
+            // validate post and update crawl history
+            try {
+                Post.check(post);
+
+                // update history if not testing
+                if (testLevel === 0) {
                     const canon = post.info.publicSquare.package.canonicalUrl;
                     updateCrawlHistory(post.infoHash, canon, config.kid, 'rss');
-                }
-            }
 
-            const message = `Successfully got all (${posts.length}) RSS posts from feed`;
-            lgr(message);
-            return {
-                success: true,
-                message,
-                data: {
-                    etag: newEtag || etag,
-                    posts,
-                },
+                    // include originalUrl if not the same as the canonicalUrl
+                    if (postData.originalUrl !== canon) {
+                        updateCrawlHistory(post.infoHash, postData.originalUrl, config.kid, 'rss');
+                    }
+                }
+
+                finalPosts.push(post);
+            } catch (error: any) {
+                const msg = handleRuntypeFail(error);
+                lgr(msg);
             }
-        })
+        }
+    }
+
+    const message = `Successfully got all (${posts.length}) RSS posts from feed`;
+    lgr(message);
+    return {
+        success: true,
+        message,
+        data: {
+            etag: newEtag || etag,
+            posts: finalPosts,
+        },
+    }
 }
 
 /**
@@ -1685,7 +1703,7 @@ async function getSitemapPosts(config: Static<typeof Sitemap>, identity: Static<
 
 /**
  * Filter an array of url strings based on provided filters
- * and the post history map.
+ * and the post history map. This also strips utm params.
  *
  * @param urls array of urls to filter
  * @param filters filter object with includes and excludes
@@ -1701,19 +1719,40 @@ async function filterCrawlUrls(urls: string[], filters: Static<typeof CrawlFilte
         return [];
     }
 
-    // remove urls already in history and bare domain
-    for (let i = 0; i < urls.length; i++) {
-        const u = urls[i];
-        const Url = new URL(u);
-        const hash = history.get(u);
-        if (typeof hash === 'undefined' && Url.pathname !== '/') {
-            filteredUrls.push(u);
+    // remove utm params and urls in history
+    const bareUrls: string[] = []
+    for (let k = 0; k < urls.length; k++) {
+        const url = new URL(urls[k]);
+
+        // check history before utm removal
+        const beforeHash = history.get(urls[k]);
+        if (typeof beforeHash !== 'undefined' || url.pathname === '/') {
+            continue;
         }
+
+        // loop through params and find ones to remove
+        const keysToDelete: string[] = [];
+        url.searchParams.forEach((value: string, key: string) => {
+            if (/^utm_/i.test(key)) {
+                keysToDelete.push(key)
+            }
+        })
+
+        for (const key of keysToDelete) {
+            url.searchParams.delete(key)
+        }
+
+        // check history after utm removal
+        const afterHash = history.get(url.href);
+        if (typeof afterHash !== 'undefined') {
+            continue;
+        }
+
+        bareUrls.push(url.href)
     }
-    // console.log(`${filteredUrls.length} urls before dedupe`)
+
     // deduplicate urls
-    filteredUrls = [...new Set(filteredUrls)];
-    // console.log(`${filteredUrls.length} urls after dedupe`)
+    filteredUrls = [...new Set(bareUrls)];
 
     // perform path filtering
     if (typeof filters.path !== 'undefined') {

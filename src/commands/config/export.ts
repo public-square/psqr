@@ -12,6 +12,7 @@ export default class ConfigExport extends Command {
 
     static flags = {
         help: flags.help({ char: 'h' }),
+        encode: flags.boolean({ char: 'e', description: 'encode the configuration so that it can be imported via the /config/settings-import?config=[encoded-string] path in the web app' }),
         network: flags.string({ char: 'n', description: 'domain of network to export instead of using default' }),
     }
 
@@ -51,19 +52,19 @@ export default class ConfigExport extends Command {
         const config = conResp.data;
 
         oraGen.succeed('Config generated');
-        const oraSave = ora(`Saving config for ${options.did}...`).start();
+        const oraSave = ora(`Saving ${flags.encode ? 'encoded ' : ''}config for ${options.did}...`).start();
 
         // create config file locally
-        const fileName = options.did.replace(/:/g, '-') + '-export-' + Date.now() + '.json'
+        const fileName = options.did.replace(/[:/]/g, '-') + '-export-' + Date.now() + '.json';
         const files: FileConfig[] = [{
             path: fileName,
             relative: true,
-            data: JSON.stringify(config),
+            data: flags.encode ? encodeURIComponent(btoa(JSON.stringify(config))) : JSON.stringify(config),
         }]
         const configFile = await createFiles(files);
 
         if (configFile.success) {
-            oraSave.succeed(`${configFile.message}\nExported config: ${configFile.files[0]}`);
+            oraSave.succeed(`${configFile.message}\nExported ${flags.encode ? 'encoded ' : ''}config: ${configFile.files[0]}`);
         } else {
             oraSave.fail(configFile.message);
         }

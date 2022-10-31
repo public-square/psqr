@@ -305,7 +305,7 @@ function getDefaultIds(): DataResponse {
 
     return {
         success: true,
-        message: 'Successfully retrieved default kid',
+        message: 'Successfully retrieved default ids',
         data: {
             bdid,
             kname,
@@ -568,7 +568,15 @@ async function refreshDid(did: string): Promise<DidResponse> {
  * @param kid did with trailing key name
  * @returns Success or Failure Message Response including pair of keys requested as JWKs
  */
-async function getKeyPair(kid: string): Promise<KeyPairsResponse> {
+async function getKeyPair(kid = ''): Promise<KeyPairsResponse> {
+    // if empty use default
+    if (kid === '') {
+        const ids = getDefaultIds();
+
+        if (ids.success === false) return { success: false, message: ids.message };
+        kid = ids.data.kid
+    }
+
     // get expected path to identity
     const paths = parseIdentityPaths(kid);
     if (paths.success === false) return { success: false, message: paths.message };

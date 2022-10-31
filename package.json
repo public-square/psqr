@@ -1,7 +1,7 @@
 {
   "name": "psqr",
   "description": "NodeJS CLI client for Virtual Public Squares.",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "author": "Virtual Public Square (protocol@vpsqr.com)",
   "bin": {
     "psqr": "./bin/run"
@@ -54,7 +54,7 @@
     "version": "npx @oclif/dev-cli readme && node ./generate-doc-html.js && git add README.md README.html",
     "generateDocs": "npx @oclif/dev-cli readme && node ./generate-doc-html.js",
     "eslint": "npx eslint . --ext .ts --config .eslintrc.json -f table",
-    "prepare": "husky install .husky"
+    "prepare": "husky install ./.husky"
   },
   "types": "lib/index.d.ts",
   "dependencies": {
